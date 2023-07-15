@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "net.vakror.mod_locking.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "mod-locking.refmap.json",
+  "mixins": [
+    "ItemMixin",
+    "ItemStackMixin",
+    "RecipeMixin"
+  ],
+  "client": [
+    "AdvancementTabTypeMixin"
+  ],
+  "minVersion": "0.8"
+}

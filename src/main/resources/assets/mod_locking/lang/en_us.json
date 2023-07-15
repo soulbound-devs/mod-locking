@@ -1,0 +1,14 @@
+{
+  "overlay.requires_unlock.usage": "You need to unlock %s in order to use this item.",
+  "overlay.requires_unlock.craft": "You need to unlock %s in order to craft this item.",
+  "overlay.requires_unlock.hit": "You need to unlock %s in order to hit this block.",
+  "overlay.requires_unlock.interact_block": "You need to unlock %s in order to interact with this block.",
+  "overlay.requires_unlock.interact_entity": "You need to unlock %s in order to interact with this entity.",
+
+  "key.mod-locking.locking_screen": "Mod Unlock Screen",
+  "key.category.mod-locking": "Mod Locking Mod",
+
+  "gui.unlocks": "Mod Unlocks",
+
+  "tooltip.requires_unlock": "Requires Unlock:"
+}
