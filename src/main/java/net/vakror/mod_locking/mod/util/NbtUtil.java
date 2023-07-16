@@ -70,7 +70,7 @@ public class NbtUtil {
 
     private static Unlock deserializeUnlock(CompoundTag compound) {
         return (compound.getString("type").equals("mod") ? deserializeModUnlock(compound.getString("name"), compound, deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock")):
-                deserializeFineGrainedUnlock(compound, compound.getString("name"), deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock"))).withDescription(Component.literal(compound.getString("description"))).withIcon(compound.getString("icon"));
+                deserializeFineGrainedUnlock(compound, compound.getString("name"), deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock"))).withDescription(Component.literal(compound.getString("description"))).withIcon(compound.getString("icon")).withIconNbt(compound.getCompound("iconNbt"));
     }
 
     public static CompoundTag serializeUnlock(Unlock unlock) {
@@ -82,6 +82,7 @@ public class NbtUtil {
         nbt.putFloat("y", unlock.getY());
         nbt.putString("description", unlock.getDescription());
         nbt.putString("icon", unlock.getIcon());
+        nbt.put("iconNbt", unlock.getIconNbt());
         nbt.putString("requiredUnlock", (unlock.getRequiredUnlock() == null ? "": unlock.getRequiredUnlock()));
         serializePoints(nbt, unlock.getCost());
         if (unlock instanceof ModUnlock modUnlock) {

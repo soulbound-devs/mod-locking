@@ -9,6 +9,7 @@ import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.advancements.AdvancementWidgetType;
 import net.minecraft.locale.Language;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -121,7 +122,12 @@ public class ModWidget {
         AdvancementWidgetType widgetType = this.isDone ? AdvancementWidgetType.OBTAINED: AdvancementWidgetType.UNOBTAINED;
 
         graphics.blit(WIDGETS_LOCATION, x + this.x + 3, y + this.y, 26, 128 + widgetType.getIndex() * 26, 26, 26);
-        graphics.renderFakeItem(new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon())))), x + this.x + 8, y + this.y + 5);
+        ItemStack fakeUnlockStack = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon()))));
+        CompoundTag tag = unlock.getIconNbt();
+        if (tag != null) {
+            fakeUnlockStack.setTag(tag);
+        }
+        graphics.renderFakeItem(fakeUnlockStack, x + this.x + 8, y + this.y + 5);
 
         for (ModWidget widget : this.children) {
             widget.draw(graphics, x, y);
@@ -199,7 +205,13 @@ public class ModWidget {
             }
         }
 
-        graphics.renderFakeItem(new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon())))), x + this.x + 8, y + this.y + 5);
+        ItemStack fakeUnlockStack = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon()))));
+        CompoundTag tag = unlock.getIconNbt();
+        if (tag != null) {
+            fakeUnlockStack.setTag(tag);
+        }
+
+        graphics.renderFakeItem(fakeUnlockStack, x + this.x + 8, y + this.y + 5);
     }
 
     public boolean isMouseOver(int p_97260_, int p_97261_, int p_97262_, int p_97263_) {

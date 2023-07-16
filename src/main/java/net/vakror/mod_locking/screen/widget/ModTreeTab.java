@@ -52,6 +52,9 @@ public class ModTreeTab {
         this.tree = tree;
         this.rootUnlocks = rootUnlocks;
         this.icon = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(tree.icon))));
+        if (tree.iconNbt != null) {
+            this.icon.setTag(tree.iconNbt);
+        }
         this.title = Component.literal(tree.name);
         this.name = tree.name;
     }

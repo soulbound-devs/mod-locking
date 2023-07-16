@@ -29,9 +29,17 @@ public class ModTree implements INBTSerializable<CompoundTag> {
     @Expose
     public String icon;
 
+    @Expose
+    public CompoundTag iconNbt;
+
     public ModTree(String name, ResourceLocation icon) {
         this.name = name;
         this.icon = icon.toString();
+    }
+
+    public ModTree withIconNbt(CompoundTag iconNbt) {
+        this.iconNbt = iconNbt;
+        return this;
     }
 
     @Override
