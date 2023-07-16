@@ -5,7 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.vakror.mod_locking.mod.point.obtain.PointObtainMethod;
 
-public abstract class ModPoint implements INBTSerializable<CompoundTag> {
+public class ModPoint implements INBTSerializable<CompoundTag> {
 
     @Expose
     public String name;
@@ -26,9 +26,14 @@ public abstract class ModPoint implements INBTSerializable<CompoundTag> {
         return this;
     }
 
-    public abstract void deserializeNBT(CompoundTag nbt);
+    public void deserializeNBT(CompoundTag nbt) {
+    };
 
-    public abstract CompoundTag serializeNBT();
+    public CompoundTag serializeNBT() {
+        return null;
+    };
 
-    public abstract int getColor();
+    public int getColor() {
+        return -1;
+    };
 }

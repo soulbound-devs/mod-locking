@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class Unlock {
+public class Unlock {
     protected String name;
     protected Map<String, Integer> cost;
 
@@ -155,11 +155,17 @@ public abstract class Unlock {
         return list;
     }
 
-    public abstract boolean restricts(Item item, Restriction.Type restrictionType);
+    public boolean restricts(Item item, Restriction.Type restrictionType) {
+        return false;
+    }
 
-    public abstract boolean restricts(Block item, Restriction.Type restrictionType);
+    public boolean restricts(Block item, Restriction.Type restrictionType) {
+        return false;
+    }
 
-    public abstract boolean restricts(EntityType<?> item, Restriction.Type restrictionType);
+    public boolean restricts(EntityType<?> item, Restriction.Type restrictionType) {
+        return false;
+    }
 
     public Unlock setCost(Map<String, Integer> cost) {
         this.cost = cost;
