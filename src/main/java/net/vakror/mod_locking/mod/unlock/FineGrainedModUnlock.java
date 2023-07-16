@@ -46,6 +46,21 @@ public class FineGrainedModUnlock extends Unlock {
         this.entityRestriction = entityRestriction;
     }
 
+    public FineGrainedModUnlock withItemRestriction(String item, boolean restricted) {
+        this.itemRestriction.put(item, Restriction.defaultItemRestrictions(restricted));
+        return this;
+    }
+
+    public FineGrainedModUnlock withBlockRestriction(String block, boolean restricted) {
+        this.blockRestriction.put(block, Restriction.defaultItemRestrictions(restricted));
+        return this;
+    }
+
+    public FineGrainedModUnlock withEntityRestriction(String entity, boolean restricted) {
+        this.entityRestriction.put(entity, Restriction.defaultItemRestrictions(restricted));
+        return this;
+    }
+
     @Override
     public boolean restricts(Item item, Restriction.Type restrictionType) {
         ResourceLocation registryName = ForgeRegistries.ITEMS.getKey(item);
