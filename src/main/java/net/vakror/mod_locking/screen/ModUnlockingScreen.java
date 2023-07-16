@@ -83,7 +83,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         }
 
         if (this.selectedTab == null && !this.tabs.isEmpty()) {
-            this.selectedTab = this.tabs.values().iterator().next();
+            this.selectedTab = this.tabs.values().stream().toList().get(0);
         }
         if (this.tabs.size() > AdvancementTabType.MAX_TABS) {
             int guiLeft = (this.width - 252) / 2;
