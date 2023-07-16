@@ -23,13 +23,14 @@ public abstract class SlotMixin {
     @Shadow
     public abstract ItemStack getItem();
 
+    @Shadow public abstract boolean mayPlace(ItemStack p_40231_);
+
     @Inject(method = "mayPickup", at = @At(value = "HEAD"), cancellable = true)
     public void restrictCraftingLockedItems(Player player, CallbackInfoReturnable<Boolean> cir) {
-        Slot thisSlot = (Slot) (Object) this;
-        if (!(thisSlot instanceof ResultSlot)) {
+        if (!this.hasItem()) {
             return;
         }
-        if (!this.hasItem()) {
+        if (this.mayPlace(this.getItem())) {
             return;
         }
         ItemStack resultStack = this.getItem();
