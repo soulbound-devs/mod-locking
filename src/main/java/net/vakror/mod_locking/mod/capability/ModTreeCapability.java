@@ -5,11 +5,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.vakror.mod_locking.mod.config.ModConfigs;
-import net.vakror.mod_locking.mod.point.ModPoint;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.util.NbtUtil;
 import net.vakror.mod_locking.packet.ModPackets;
-import net.vakror.mod_locking.packet.RequestPointUpdateC2SPacket;
 import net.vakror.mod_locking.packet.SyncPointsS2CPacket;
 
 import java.util.*;

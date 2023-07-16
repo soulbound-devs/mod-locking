@@ -81,8 +81,10 @@ public class ModTree implements INBTSerializable<CompoundTag> {
     public String restrictedBy(Item item, Restriction.Type restrictionType) {
         for (Unlock unlock : ModConfigs.UNLOCKS.getAll()) {
             if (modsUnlocked == null) modsUnlocked = new ArrayList<>();
-            if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(item, restrictionType)) continue;
-            return unlock.getName();
+            if (unlock.getTree().equals(name)) {
+                if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(item, restrictionType)) continue;
+                return unlock.getName();
+            }
         }
         return null;
     }
@@ -90,8 +92,10 @@ public class ModTree implements INBTSerializable<CompoundTag> {
     public String restrictedBy(Block block, Restriction.Type restrictionType) {
         for (Unlock unlock : ModConfigs.UNLOCKS.getAll()) {
             if (modsUnlocked == null) modsUnlocked = new ArrayList<>();
-            if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(block, restrictionType)) continue;
-            return unlock.getName();
+            if (unlock.getTree().equals(name)) {
+                if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(block, restrictionType)) continue;
+                return unlock.getName();
+            }
         }
         return null;
     }
@@ -99,8 +103,11 @@ public class ModTree implements INBTSerializable<CompoundTag> {
     public String restrictedBy(EntityType<?> entityType, Restriction.Type restrictionType) {
         for (Unlock unlock : ModConfigs.UNLOCKS.getAll()) {
             if (modsUnlocked == null) modsUnlocked = new ArrayList<>();
-            if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(entityType, restrictionType)) continue;
-            return unlock.getName();
+            if (unlock.getTree().equals(name)) {
+                if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(entityType, restrictionType))
+                    continue;
+                return unlock.getName();
+            }
         }
         return null;
     }

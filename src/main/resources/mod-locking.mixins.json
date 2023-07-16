@@ -5,7 +5,6 @@
   "refmap": "mod-locking.refmap.json",
   "mixins": [
     "ItemMixin",
-    "ItemStackMixin",
     "SlotMixin"
   ],
   "client": [

@@ -32,10 +32,10 @@ public class ModPackets {
                 .consumerNetworkThread(OpenLockingScreenC2SPacket::handle)
                 .add();
 
-        net.messageBuilder(RequestPointUpdateC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(RequestPointUpdateC2SPacket::new)
-                .encoder(RequestPointUpdateC2SPacket::encode)
-                .consumerNetworkThread(RequestPointUpdateC2SPacket::handle)
+        net.messageBuilder(RequestTreeUpdateC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(RequestTreeUpdateC2SPacket::new)
+                .encoder(RequestTreeUpdateC2SPacket::encode)
+                .consumerNetworkThread(RequestTreeUpdateC2SPacket::handle)
                 .add();
 
         net.messageBuilder(SyncPointsS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)

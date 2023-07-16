@@ -40,7 +40,7 @@ public abstract class Config {
 
     public <T extends Config> T readConfig() {
         ModLockingMod.LOGGER.info("Reading config: " + this.getName());
-        try (FileReader reader = new FileReader(this.getConfigFile());){
+        try (FileReader reader = new FileReader(this.getConfigFile())){
             Config config = GSON.fromJson(reader, this.getClass());
             config.onLoad(this);
             if (!config.isValid()) {
@@ -51,6 +51,8 @@ public abstract class Config {
             return (T)config2;
         }
         catch (Exception e) {
+            System.out.println(e.getClass());
+            e.printStackTrace();
             ModLockingMod.LOGGER.warn("Config file {} not found, generating new", this);
             this.generateConfig();
             return (T) this;
