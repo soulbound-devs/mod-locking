@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.vakror.mod_locking.locking.Restriction;
 
-public class FineGrainedModUnlock extends Unlock {
+public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
     @Expose
     protected Map<String, Restriction> itemRestriction = new HashMap<String, Restriction>();
     @Expose

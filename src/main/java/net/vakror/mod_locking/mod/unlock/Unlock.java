@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Block;
 import net.vakror.mod_locking.Tooltip;
 import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.Unlocks;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.util.NbtUtil;
 import net.vakror.mod_locking.screen.ModUnlockingScreen;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Unlock {
+public class Unlock<T extends Unlock> {
     protected String name;
     protected Map<String, Integer> cost;
 
@@ -56,30 +57,30 @@ public class Unlock {
         return cost;
     }
 
-    public Unlock withDescription(Component component) {
+    public T withDescription(Component component) {
         description = component.getString();
-        return this;
+        return (T) this;
     }
 
-    public Unlock withIcon(String item) {
+    public T withIcon(String item) {
         icon = item;
-        return this;
+        return (T) this;
     }
 
-    public Unlock withTree(ModTree tree) {
+    public T withTree(ModTree tree) {
         this.tree = tree.name;
-        return this;
+        return (T) this;
     }
 
 
-    public Unlock withTree(String tree) {
+    public T withTree(String tree) {
         this.tree = tree;
-        return this;
+        return (T) this;
     }
 
-    public Unlock withIconNbt(CompoundTag nbt) {
+    public T withIconNbt(CompoundTag nbt) {
         iconNbt = nbt;
-        return this;
+        return (T) this;
     }
 
     public String getTree() {
@@ -90,7 +91,7 @@ public class Unlock {
         if (this.requiredUnlock == null || this.requiredUnlock.equals("")) {
             return null;
         }
-        for (Unlock unlock: ModConfigs.UNLOCKS.unlocks) {
+        for (Unlock unlock: ModConfigs.UNLOCKS.getAll()) {
             if (unlock.getName().equals(this.requiredUnlock)) {
                 return unlock;
             }

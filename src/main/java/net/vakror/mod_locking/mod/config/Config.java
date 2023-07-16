@@ -2,8 +2,10 @@ package net.vakror.mod_locking.mod.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.vakror.mod_locking.ModLockingMod;
+import net.vakror.mod_locking.mod.unlock.Unlock;
 
 import java.io.File;
 import java.io.FileReader;
@@ -12,7 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 public abstract class Config {
-    private static final Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().registerTypeAdapter(CompoundTag.class, CompoundTagAdapter.INSTANCE).setPrettyPrinting().create();
 
     public void generateConfig() {
         this.reset();

@@ -11,7 +11,9 @@ import java.util.*;
 
 public class ModUnlocksConfig extends Config {
     @Expose
-    public List<Unlock> unlocks = new ArrayList<>();
+    public List<ModUnlock> modUnlocks = new ArrayList<>();
+    @Expose
+    public List<FineGrainedModUnlock> fineGrainedUnlocks = new ArrayList<>();
 
     @Override
     public String getName() {
@@ -19,7 +21,10 @@ public class ModUnlocksConfig extends Config {
     }
 
     public List<Unlock> getAll() {
-        return new ArrayList<>(this.unlocks);
+        List<Unlock> all = new ArrayList<>();
+        all.addAll(modUnlocks);
+        all.addAll(fineGrainedUnlocks);
+        return all;
     }
     @Override
     protected void reset() {

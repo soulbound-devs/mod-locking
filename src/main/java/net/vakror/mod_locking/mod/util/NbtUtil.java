@@ -68,7 +68,7 @@ public class NbtUtil {
         return unlocks;
     }
 
-    private static Unlock deserializeUnlock(CompoundTag compound) {
+    public static Unlock deserializeUnlock(CompoundTag compound) {
         return (compound.getString("type").equals("mod") ? deserializeModUnlock(compound.getString("name"), compound, deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock")):
                 deserializeFineGrainedUnlock(compound, compound.getString("name"), deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock"))).withDescription(Component.literal(compound.getString("description"))).withIcon(compound.getString("icon")).withIconNbt(compound.getCompound("iconNbt")).withTree(compound.getString("tree"));
     }

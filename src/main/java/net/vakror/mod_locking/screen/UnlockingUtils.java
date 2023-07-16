@@ -11,11 +11,8 @@ import net.minecraftforge.network.NetworkHooks;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
-import net.vakror.mod_locking.mod.config.ModUnlocksConfig;
-import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.util.NbtUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -29,12 +26,12 @@ public class UnlockingUtils {
 
             @Override
             public @NotNull AbstractContainerMenu createMenu(int syncId, @NotNull Inventory inv, @NotNull Player player) {
-                return new ModUnlockingMenu(syncId, inv, ModConfigs.UNLOCKS.unlocks, ModConfigs.TREES.trees, player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints());
+                return new ModUnlockingMenu(syncId, inv, ModConfigs.UNLOCKS.getAll(), ModConfigs.TREES.trees, player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints());
             }
         }, (buf -> {
             CompoundTag tag = new CompoundTag();
             CompoundTag allPointsTag = new CompoundTag();
-            NbtUtil.serializeUnlocks(tag, ModConfigs.UNLOCKS.unlocks);
+            NbtUtil.serializeUnlocks(tag, ModConfigs.UNLOCKS.getAll());
             NbtUtil.serializeTrees(tag, ModConfigs.TREES.trees);
             NbtUtil.serializePoints(tag, player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints());
             Map<String, Integer> allPoints = new HashMap<>(ModConfigs.POINTS.points.size());

@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ModUnlock extends Unlock{
+public class ModUnlock extends Unlock<ModUnlock>{
     @Expose
     protected Set<String> modIds = new HashSet<String>();
     @Expose
