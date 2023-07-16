@@ -7,8 +7,8 @@ public class ModConfigs {
     public static ModPointsConfig POINTS;
 
     public static void register() {
-        UNLOCKS = new ModUnlocksConfig().readConfig();
         TREES = new ModTreesConfig().readConfig();
+        UNLOCKS = new ModUnlocksConfig().readConfig();
         POINTS = new ModPointsConfig().readConfig();
     }
 }
