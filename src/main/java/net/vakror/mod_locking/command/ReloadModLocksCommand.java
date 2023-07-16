@@ -11,7 +11,7 @@ import net.vakror.mod_locking.mod.config.ModConfigs;
 
 public class ReloadModLocksCommand {
     public ReloadModLocksCommand(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("reload").then(Commands.literal("mod-locks")
+        dispatcher.register(Commands.literal("mod-locks").then(Commands.literal("reload")
                 .executes(this::execute)));
     }
 
