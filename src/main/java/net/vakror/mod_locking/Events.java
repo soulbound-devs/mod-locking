@@ -13,6 +13,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -20,6 +21,8 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.server.command.ConfigCommand;
+import net.vakror.mod_locking.command.ReloadModLocksCommand;
 import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.tree.ModTrees;
@@ -98,6 +101,15 @@ public class Events {
             }
         }));
     }
+
+    @SubscribeEvent
+    public static void onCommandsRegister(RegisterCommandsEvent event) {
+        new ReloadModLocksCommand(event.getDispatcher());
+
+        ConfigCommand.register(event.getDispatcher());
+    }
+
+
 
     @SubscribeEvent
     public static void onBlockHit(PlayerInteractEvent.LeftClickBlock event) {
