@@ -17,7 +17,7 @@ public class ModUnlock extends Unlock{
     @Expose
     protected Set<String> modIds = new HashSet<String>();
     @Expose
-    protected Restriction restriction = Restriction.defaultModRestrictions();
+    protected Restriction restriction = Restriction.defaultModRestrictions(true);
 
     public ModUnlock(String name, Map<String, Integer> costMap, String requiredUnlocks, float x, float y,String ... modIds) {
         super(name, costMap, requiredUnlocks, x, y);

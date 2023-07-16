@@ -29,6 +29,16 @@ public class Restriction {
         return restrictions;
     }
 
+    public static Restriction defaultModRestrictions(boolean restricted) {
+        Restriction restrictions = new Restriction();
+        restrictions.restrictions.put(Type.USABILITY, restricted);
+        restrictions.restrictions.put(Type.CRAFTABILITY, restricted);
+        restrictions.restrictions.put(Type.HITTABILITY, restricted);
+        restrictions.restrictions.put(Type.BLOCK_INTERACTABILITY, restricted);
+        restrictions.restrictions.put(Type.ENTITY_INTERACTABILITY, restricted);
+        return restrictions;
+    }
+
     public static Restriction defaultItemRestrictions(boolean restricted) {
         Restriction restrictions = new Restriction();
         restrictions.restrictions.put(Type.USABILITY, restricted);
