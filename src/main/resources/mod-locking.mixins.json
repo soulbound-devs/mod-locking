@@ -6,7 +6,7 @@
   "mixins": [
     "ItemMixin",
     "ItemStackMixin",
-    "RecipeMixin"
+    "SlotMixin"
   ],
   "client": [
     "AdvancementTabTypeMixin"

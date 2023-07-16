@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 @Mixin(Slot.class)
-public abstract class RecipeMixin {
+public abstract class SlotMixin {
     @Shadow
     public abstract boolean hasItem();
 
