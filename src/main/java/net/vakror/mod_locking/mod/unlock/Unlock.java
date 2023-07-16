@@ -26,7 +26,7 @@ public abstract class Unlock {
 
     protected float x;
     protected float y;
-    protected String description;
+    protected String description = "sample description";
     protected String icon;
     protected String tree;
 
@@ -68,6 +68,12 @@ public abstract class Unlock {
 
     public Unlock withTree(ModTree tree) {
         this.tree = tree.name;
+        return this;
+    }
+
+
+    public Unlock withTree(String tree) {
+        this.tree = tree;
         return this;
     }
 

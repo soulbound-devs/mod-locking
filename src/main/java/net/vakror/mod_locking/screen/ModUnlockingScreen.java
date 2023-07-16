@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.ModUnlock;
 import net.vakror.mod_locking.mod.unlock.Unlock;
@@ -76,7 +77,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
                 nonRoots.add(unlock);
             }
         }
-        onAddUnlockRoots(roots);
+        onAddUnlockRoots(roots, true);
         for (Unlock nonRoot: nonRoots) {
             onAddNonRootUnlock(nonRoot);
         }
@@ -243,8 +244,22 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         }
     }
 
+    public void onAddUnlockRoots(List<Unlock> unlock, boolean a) {
+        for (int i = 0; i < this.menu.trees.size(); i++) {
+            List<Unlock> unlocks = new ArrayList<>(unlock.size());
+            for (Unlock unlock1: unlock) {
+                if (unlock1.getTree().equals(this.menu.trees.get(i).name)) {
+                    unlocks.add(unlock1);
+                }
+            }
+            onAddUnlockRoots(unlocks);
+        }
+    }
+
     public void onAddUnlockRoots(List<Unlock> unlock) {
-        ModTreeTab treeTab = ModTreeTab.create(this.minecraft, this, this.tabs.size(), this.menu.trees.get(Math.max(this.tabs.size() - 1, 0)));
+        ModTreeTab treeTab = ModTreeTab.create(this.minecraft, this, this.tabs.size(), this.menu.trees.get(Math.max(this.tabs.size(), 0)));
+        List<ModTree> trees = this.menu.trees;
+        Map<List<ModWidget>, ModTreeTab> treeTabs = this.tabs;
         List<ModWidget> root = new ArrayList<>(unlock.size());
         assert treeTab != null;
         for (Unlock unlock1: unlock) {

@@ -70,7 +70,7 @@ public class NbtUtil {
 
     private static Unlock deserializeUnlock(CompoundTag compound) {
         return (compound.getString("type").equals("mod") ? deserializeModUnlock(compound.getString("name"), compound, deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock")):
-                deserializeFineGrainedUnlock(compound, compound.getString("name"), deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock"))).withDescription(Component.literal(compound.getString("description"))).withIcon(compound.getString("icon")).withIconNbt(compound.getCompound("iconNbt"));
+                deserializeFineGrainedUnlock(compound, compound.getString("name"), deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock"))).withDescription(Component.literal(compound.getString("description"))).withIcon(compound.getString("icon")).withIconNbt(compound.getCompound("iconNbt")).withTree(compound.getString("tree"));
     }
 
     public static CompoundTag serializeUnlock(Unlock unlock) {
@@ -82,7 +82,8 @@ public class NbtUtil {
         nbt.putFloat("y", unlock.getY());
         nbt.putString("description", unlock.getDescription());
         nbt.putString("icon", unlock.getIcon());
-        nbt.put("iconNbt", unlock.getIconNbt());
+        nbt.putString("tree", unlock.getTree());
+        nbt.put("iconNbt", (unlock.getIconNbt() == null ? new CompoundTag(): unlock.getIconNbt()));
         nbt.putString("requiredUnlock", (unlock.getRequiredUnlock() == null ? "": unlock.getRequiredUnlock()));
         serializePoints(nbt, unlock.getCost());
         if (unlock instanceof ModUnlock modUnlock) {
@@ -227,6 +228,10 @@ public class NbtUtil {
             nbt.putString("point_plural_name_" + point, getPoint(point).pluralName);
             nbt.putInt("point_color_" + point, getPoint(point).getColor());
             CompoundTag obtainMethod = new CompoundTag();
+            ModPoint point1 = getPoint(point);
+            if (point1.pointObtainMethod == null) {
+                point1.pointObtainMethod = new RightClickItemObtainMethod("minecraft:diamond", 0);
+            }
             obtainMethod.putString("type", getPoint(point).pointObtainMethod.getName());
             obtainMethod.putInt("amount", getPoint(point).pointObtainMethod.getAmount());
             if (getPoint(point).name.equals("rightClickItem")) {
