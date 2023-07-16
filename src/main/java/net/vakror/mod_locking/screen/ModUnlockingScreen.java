@@ -108,8 +108,8 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
 
             for(ModTreeTab tab : this.tabs.values()) {
                 if (tab.getPage() == tabPage && tab.isMouseOver(i, j, p_97343_, p_97344_)) {
-                    selectedTab = this.tabs.get(tab.getRootUnlocks());
-                    break;
+                    selectedTab = tab;
+                    System.out.println(selectedTab);
                 }
             }
         }
