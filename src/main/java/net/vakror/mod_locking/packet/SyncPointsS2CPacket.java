@@ -3,12 +3,9 @@ package net.vakror.mod_locking.packet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
-import net.vakror.mod_locking.mod.point.IntColorPoint;
 import net.vakror.mod_locking.mod.point.ModPoint;
 import net.vakror.mod_locking.mod.util.NbtUtil;
 
@@ -50,11 +47,18 @@ public class SyncPointsS2CPacket {
             }));
 
             ModConfigs.POINTS.points = new ArrayList<>();
-            pointAmounts.forEach((name, amount) -> {
-                ModConfigs.POINTS.points.add(new IntColorPoint(name, pointColors.get(name), pointPluralNames.get(name)));
-            });
+            pointAmounts.forEach((name, amount) -> ModConfigs.POINTS.points.add(new ModPoint(name, pointPluralNames.get(name), decode(pointColors.get(name))[0], decode(pointColors.get(name))[1], decode(pointColors.get(name))[2])));
         });
         return true;
+    }
+
+    public static int[] decode(int color) {
+        int[] rgb = new int[4];
+        rgb[3] = (color >> 24) & 0xff; // or color >>> 24
+        rgb[0] = (color >> 16) & 0xff;
+        rgb[1] = (color >>  8) & 0xff;
+        rgb[2] = (color      ) & 0xff;
+        return rgb;
     }
 }
 
