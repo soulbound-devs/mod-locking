@@ -53,7 +53,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     private static final Component VERY_SAD_LABEL = Component.translatable("advancements.sad_label");
     private static final Component NO_ADVANCEMENTS_LABEL = Component.translatable("advancements.empty");
     private static final Component TITLE = Component.literal("Mod Unlocking");
-    private final Map<List<ModWidget>, ModTreeTab> tabs = new HashMap<>(this.menu.trees.size());
+    private final Map<List<ModWidget>, ModTreeTab> tabs = new LinkedHashMap<>(this.menu.trees.size());
     @Nullable
     private ModTreeTab selectedTab;
     private boolean isScrolling;
