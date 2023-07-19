@@ -13,20 +13,12 @@ public class ModPoint implements INBTSerializable<CompoundTag> {
     @Expose
     public String pluralName;
 
-    @Expose
-    public PointObtainMethod pointObtainMethod;
-
     public ModPoint(String name, String pluralName, int red, int green, int blue) {
         this.name = name;
         this.pluralName = pluralName;
         this.red = red;
         this.green = green;
         this.blue = blue;
-    }
-
-    public ModPoint withPointObtainMethod(PointObtainMethod method) {
-        this.pointObtainMethod = method;
-        return this;
     }
     @Expose
     public int red;

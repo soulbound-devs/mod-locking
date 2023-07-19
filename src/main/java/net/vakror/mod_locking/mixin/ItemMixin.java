@@ -33,20 +33,17 @@ import java.util.Objects;
 
 @Mixin(Item.class)
 public abstract class ItemMixin {
-    @Shadow public abstract Item asItem();
+    @Shadow
+    public abstract Item asItem();
 
     @Inject(method = "use", at = @At("HEAD"))
     public void addPointsOnUse(Level level, Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
         if (!level.isClientSide) {
-            ModConfigs.POINTS.points.forEach((point -> {
-                if (point.pointObtainMethod.getName().equals("rightClickItem")) {
-                    RightClickItemObtainMethod method = (RightClickItemObtainMethod) point.pointObtainMethod;
-                    Objects.equals(ForgeRegistries.ITEMS.getValue(new ResourceLocation(method.itemId)), this.asItem());
-                    if ((Objects.equals(ForgeRegistries.ITEMS.getValue(new ResourceLocation(method.itemId)), this.asItem()))) {
-                        player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
-                            modTreeCapability.addPoint(point.name, method.getAmount() == 0 ? 1 : method.getAmount(), player);
-                        }));
-                    }
+            ModConfigs.POINT_OBTAIN_METHODS.useItemObtainMethods.forEach((obtainMethod -> {
+                if ((Objects.equals(ForgeRegistries.ITEMS.getValue(new ResourceLocation(obtainMethod.itemId)), this.asItem()))) {
+                    player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
+                        modTreeCapability.addPoint(obtainMethod.getPointType(), obtainMethod.getAmount() == 0 ? 1 : obtainMethod.getAmount(), player);
+                    }));
                 }
             }));
         }
