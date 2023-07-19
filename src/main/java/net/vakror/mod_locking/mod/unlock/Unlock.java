@@ -152,6 +152,10 @@ public class Unlock<T extends Unlock> {
         }
 
         list.add(Component.empty());
+        if (requiredUnlock != null && !requiredUnlock.equals("")) {
+            list.add(Component.literal("Requires: §e" + requiredUnlock));
+        }
+        list.add(Component.empty());
         list.add(Component.literal(description));
         return list;
     }
