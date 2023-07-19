@@ -103,8 +103,9 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     @Override
     public boolean mouseClicked(double p_97343_, double p_97344_, int p_97345_) {
         if (p_97345_ == 0) {
-            int i = (this.width - (width - 30 * 2)) / 2;
-            int j = (this.height - (height - 30 * 2)) / 2;
+            assert selectedTab != null;
+            int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
+            int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
 
             for(ModTreeTab tab : this.tabs.values()) {
                 if (tab.getPage() == tabPage && tab.isMouseOver(i, j, p_97343_, p_97344_)) {
@@ -119,13 +120,14 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
 
     @Override
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        int i = (this.width - (width - 30 * 2)) / 2;
-        int j = (this.height - (height - 30 * 2)) / 2;
+        assert selectedTab != null;
+        int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
+        int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
         this.renderBackground(graphics);
         if (maxPages != 0) {
             net.minecraft.network.chat.Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
             int width = this.font.width(page);
-            graphics.drawString(this.font, page.getVisualOrderText(), i + ((width - 30 * 2) / 2) - (width / 2), j - 44, -1);
+            graphics.drawString(this.font, page.getVisualOrderText(), i + ((width - selectedTab.getMarginX() * 2) / 2) - (width / 2), j - 44, -1);
         }
         this.renderInside(graphics, pMouseX, pMouseY, i, j);
         this.renderWindow(graphics, i, j);
@@ -197,8 +199,9 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         int screenW = 252;
         int screenH = 140;
         // actual size that will be available for the box
-        int actualW = width - 30 - iw - x;
-        int actualH = width - 30 - y;
+        assert selectedTab != null;
+        int actualW = width - selectedTab.getMarginX() - iw - x;
+        int actualH = width - selectedTab.getMarginY() - y;
         int halfW = screenW / 2;
         int halfH = screenH / 2;
         // When the screen is less than the default size the corners overlap
@@ -212,8 +215,8 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         // ──┼──    1: 0    0     2: 126  0
         // 3 │ 4    3: 0    70    4: 126  70
 
-        int rightQuadX = width - 30 - halfW - iw + clipXh;
-        int bottomQuadY = height - 30 - halfH + clipYh;
+        int rightQuadX = width - selectedTab.getMarginX() - halfW - iw + clipXh;
+        int bottomQuadY = height - selectedTab.getMarginY() - halfH + clipYh;
 
         graphics.blit(WINDOW_LOCATION, x, y, 0, 0, halfW - clipXl, halfH - clipYl);
         graphics.blit(WINDOW_LOCATION, rightQuadX, y, halfW + clipXh, 0, halfW - clipXh, halfH - clipYl); // top right
@@ -257,9 +260,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     }
 
     public void onAddUnlockRoots(List<Unlock> unlock) {
-        ModTreeTab treeTab = ModTreeTab.create(this.minecraft, this, this.tabs.size(), this.menu.trees.get(Math.max(this.tabs.size(), 0)));
-        List<ModTree> trees = this.menu.trees;
-        Map<List<ModWidget>, ModTreeTab> treeTabs = this.tabs;
+        ModTreeTab treeTab = ModTreeTab.create(this.minecraft, this, this.tabs.size(), this.menu.trees.get(this.tabs.size()));
         List<ModWidget> root = new ArrayList<>(unlock.size());
         assert treeTab != null;
         for (Unlock unlock1: unlock) {

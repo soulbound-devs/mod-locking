@@ -32,6 +32,18 @@ public class ModTree implements INBTSerializable<CompoundTag> {
     @Expose
     public CompoundTag iconNbt;
 
+    @Expose
+    public int startScrollX = 0;
+
+    @Expose
+    public int startScrollY = 0;
+
+    @Expose
+    public int marginX = 30;
+
+    @Expose
+    public int marginY = 30;
+
     public ModTree(String name, ResourceLocation icon) {
         this.name = name;
         this.icon = icon.toString();
@@ -56,6 +68,10 @@ public class ModTree implements INBTSerializable<CompoundTag> {
         });
         nbt.put("unlocks", unlocks);
         nbt.putString("treeName", name);
+        nbt.putInt("startScrollX", startScrollX);
+        nbt.putInt("startScrollY", startScrollY);
+        nbt.putInt("marginX", marginX);
+        nbt.putInt("marginY", marginY);
         nbt.putString("background", (backgroundTexture == null ? "": backgroundTexture));
         nbt.putString("icon", icon);
         return nbt;
@@ -74,6 +90,10 @@ public class ModTree implements INBTSerializable<CompoundTag> {
             this.modsUnlocked.add(name);
         }
         name = nbt.getString("treeName");
+        startScrollX = nbt.getInt("startScrollX");
+        startScrollY = nbt.getInt("startScrollY");
+        marginX = nbt.getInt("marginX");
+        marginY = nbt.getInt("marginY");
         backgroundTexture = nbt.getString("background");
         icon = nbt.getString("icon");
     }
@@ -95,6 +115,26 @@ public class ModTree implements INBTSerializable<CompoundTag> {
 
     public ModTree withBackgroundTexture(String backgroundTexture) {
         this.backgroundTexture = backgroundTexture;
+        return this;
+    }
+
+    public ModTree withStartScrollX(int startScrollX) {
+        this.startScrollX = startScrollX;
+        return this;
+    }
+
+    public ModTree withStartScrollY(int startScrollY) {
+        this.startScrollY = startScrollY;
+        return this;
+    }
+
+    public ModTree withMarginX(int marginX) {
+        this.marginX = marginX;
+        return this;
+    }
+
+    public ModTree withMarginY(int marginY) {
+        this.marginY = marginY;
         return this;
     }
 }
