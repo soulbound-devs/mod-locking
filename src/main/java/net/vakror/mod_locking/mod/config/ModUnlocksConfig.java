@@ -1,8 +1,6 @@
 package net.vakror.mod_locking.mod.config;
 
 import com.google.gson.annotations.Expose;
-import net.minecraft.network.chat.Component;
-import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.ModUnlock;
 import net.vakror.mod_locking.mod.unlock.Unlock;
@@ -41,13 +39,5 @@ public class ModUnlocksConfig extends Config {
         hashMap.put(point, count);
         hashMap.put(point1, count1);
         return hashMap;
-    }
-
-    public Map<String, Integer> getAllPoints() {
-        Map<String, Integer> costMap = new HashMap<>();
-
-        unlocks.forEach((unlock -> costMap.putAll(unlock.getCost())));
-
-        return costMap;
     }
 }
