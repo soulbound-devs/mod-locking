@@ -1,6 +1,8 @@
 package net.vakror.mod_locking.screen;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -8,6 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.network.NetworkHooks;
+import net.vakror.mod_locking.ModLockingMod;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
@@ -41,6 +44,10 @@ public class UnlockingUtils {
             NbtUtil.serializePoints(allPointsTag, allPoints);
             tag.put("allPoints", allPointsTag);
             buf.writeNbt(tag);
+            FriendlyByteBuf output = new FriendlyByteBuf(Unpooled.buffer());
+            output.writeVarInt(buf.readableBytes());
+            output.writeBytes(buf);
+            ModLockingMod.LOGGER.debug("Sent Bytes: " + output.readableBytes());
         }));
     }
 }
