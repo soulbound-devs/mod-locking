@@ -4,6 +4,7 @@
   "overlay.requires_unlock.hit": "You need to unlock %s in order to hit this block.",
   "overlay.requires_unlock.interact_block": "You need to unlock %s in order to interact with this block.",
   "overlay.requires_unlock.interact_entity": "You need to unlock %s in order to interact with this entity.",
+  "overlay.requires_unlock.hit_entity": "You need to unlock %s in order to hit this entity.",
 
   "key.mod-locking.locking_screen": "Mod Unlock Screen",
   "key.category.mod-locking": "Mod Locking Mod",

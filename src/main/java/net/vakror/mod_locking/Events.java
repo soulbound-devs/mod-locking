@@ -204,7 +204,7 @@ public class Events {
             String restrictedBy = unlockTree.restrictedBy((event.getEntity()).getType(), Restriction.Type.ENTITY_INTERACTABILITY);
             if (restrictedBy != null) {
                 if (player.level().isClientSide) {
-                    warnPlayerNeedsUnlock(restrictedBy, "interact_entity");
+                    warnPlayerNeedsUnlock(restrictedBy, "hit_entity");
                 }
                 event.setCanceled(true);
                 return;
