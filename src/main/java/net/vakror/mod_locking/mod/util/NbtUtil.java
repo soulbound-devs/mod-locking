@@ -197,26 +197,6 @@ public class NbtUtil {
         }
         return new HashMap<>();
     }
-
-    public static Map<String, PointObtainMethod> deserializePointObtainMethod(CompoundTag nbt) {
-        String[] pointTypes = toArray(nbt.getString("pointTypes"));
-
-        if (pointTypes.length != 0) {
-            Map<String, PointObtainMethod> points = new HashMap<>(pointTypes.length);
-            Arrays.stream(pointTypes).forEach((pointType -> points.put(pointType, deserializeObtainMethod(nbt.getCompound("obtainMethod")))));
-            return points;
-        }
-        return new HashMap<>();
-    }
-
-    private static PointObtainMethod deserializeObtainMethod(CompoundTag obtainMethod) {
-        return (obtainMethod.getString("type").equals("rightClickItem") ? deserializeRightClickItem(obtainMethod): null);
-    }
-
-    private static PointObtainMethod deserializeRightClickItem(CompoundTag obtainMethod) {
-        return new RightClickItemObtainMethod(obtainMethod.getString("item"), obtainMethod.getInt("amount"));
-    }
-
     public static void serializePoints(CompoundTag nbt, Map<String, Integer> points) {
         String[] pointTypes = new String[points.size()];
 
@@ -225,17 +205,6 @@ public class NbtUtil {
             nbt.putInt("point_amount_" + point, amount);
             nbt.putString("point_plural_name_" + point, getPoint(point).pluralName);
             nbt.putInt("point_color_" + point, getPoint(point).getColor());
-            CompoundTag obtainMethod = new CompoundTag();
-            ModPoint point1 = getPoint(point);
-            if (point1.pointObtainMethod == null) {
-                point1.pointObtainMethod = new RightClickItemObtainMethod("minecraft:diamond", 0);
-            }
-            obtainMethod.putString("type", getPoint(point).pointObtainMethod.getName());
-            obtainMethod.putInt("amount", getPoint(point).pointObtainMethod.getAmount());
-            if (getPoint(point).name.equals("rightClickItem")) {
-                obtainMethod.putString("item", ((RightClickItemObtainMethod) getPoint(point).pointObtainMethod).itemId);
-            }
-            nbt.put("obtainMethod", obtainMethod);
             pointTypes[i[0]] = point;
             i[0]++;
         }));
