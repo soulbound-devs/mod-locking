@@ -77,39 +77,20 @@ public class ModTree implements INBTSerializable<CompoundTag> {
         backgroundTexture = nbt.getString("background");
         icon = nbt.getString("icon");
     }
-
-    public String restrictedBy(Item item, Restriction.Type restrictionType) {
+    public <P> String restrictedBy(P item, Restriction.Type restrictionType) {
+        StringBuilder sb = new StringBuilder();
         for (Unlock unlock : ModConfigs.UNLOCKS.getAll()) {
             if (modsUnlocked == null) modsUnlocked = new ArrayList<>();
             if (unlock.getTree().equals(name)) {
-                if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(item, restrictionType)) continue;
-                return unlock.getName();
+                if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(item, restrictionType, true)) continue;
+                if (sb.isEmpty()) {
+                    sb.append(unlock.getName());
+                } else {
+                    sb.append(", ").append(unlock.getName());
+                }
             }
         }
-        return null;
-    }
-
-    public String restrictedBy(Block block, Restriction.Type restrictionType) {
-        for (Unlock unlock : ModConfigs.UNLOCKS.getAll()) {
-            if (modsUnlocked == null) modsUnlocked = new ArrayList<>();
-            if (unlock.getTree().equals(name)) {
-                if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(block, restrictionType)) continue;
-                return unlock.getName();
-            }
-        }
-        return null;
-    }
-
-    public String restrictedBy(EntityType<?> entityType, Restriction.Type restrictionType) {
-        for (Unlock unlock : ModConfigs.UNLOCKS.getAll()) {
-            if (modsUnlocked == null) modsUnlocked = new ArrayList<>();
-            if (unlock.getTree().equals(name)) {
-                if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(entityType, restrictionType))
-                    continue;
-                return unlock.getName();
-            }
-        }
-        return null;
+        return sb.toString().isBlank() ? null: sb.toString();
     }
 
     public ModTree withBackgroundTexture(String backgroundTexture) {

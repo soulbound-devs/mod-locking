@@ -67,15 +67,18 @@ public class ClientEvents {
                     if (restrictionCausedBy == null) {
                         return;
                     }
+                    List<String> locks = Arrays.stream(restrictionCausedBy.split(", ")).toList();
                     Style textStyle = Style.EMPTY.withColor(TextColor.fromRgb(-5723992));
                     Style style = Style.EMPTY.withColor(TextColor.fromRgb(-203978));
                     MutableComponent text = Component.translatable("tooltip.requires_unlock");
-                    MutableComponent name = Component.literal(" " + restrictionCausedBy);
                     text.setStyle(textStyle);
-                    name.setStyle(style);
                     event.getToolTip().add(Component.empty());
                     event.getToolTip().add(text);
-                    event.getToolTip().add(name);
+                    locks.forEach((lock -> {
+                        MutableComponent name = Component.literal(" " + lock);
+                        name.setStyle(style);
+                        event.getToolTip().add(name);
+                    }));
                 }));
             }
         }
