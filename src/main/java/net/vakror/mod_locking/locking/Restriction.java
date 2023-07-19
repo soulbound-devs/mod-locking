@@ -19,7 +19,7 @@ public class Restriction {
         return this.restrictions.getOrDefault(type, false);
     }
 
-    public static Restriction defaultModRestrictions() {
+    public static Restriction defaultRestrictions() {
         Restriction restrictions = new Restriction();
         restrictions.restrictions.put(Type.USABILITY, false);
         restrictions.restrictions.put(Type.CRAFTABILITY, false);
@@ -29,7 +29,7 @@ public class Restriction {
         return restrictions;
     }
 
-    public static Restriction defaultModRestrictions(boolean restricted) {
+    public static Restriction defaultRestrictions(boolean restricted) {
         Restriction restrictions = new Restriction();
         restrictions.restrictions.put(Type.USABILITY, restricted);
         restrictions.restrictions.put(Type.CRAFTABILITY, restricted);
