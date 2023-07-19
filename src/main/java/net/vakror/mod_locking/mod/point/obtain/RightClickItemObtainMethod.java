@@ -10,8 +10,8 @@ public class RightClickItemObtainMethod extends PointObtainMethod {
 
     public String itemId;
 
-    public RightClickItemObtainMethod(String item, int amount) {
-        super("rightClickItem", amount);
+    public RightClickItemObtainMethod(String item, int amount, String pointType) {
+        super(amount, pointType);
         this.itemId = item;
     }
 }
