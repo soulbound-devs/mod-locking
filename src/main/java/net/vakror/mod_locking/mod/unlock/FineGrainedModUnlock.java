@@ -93,8 +93,6 @@ public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
         if (item instanceof EntityType<?>) {
             restriction = this.entityRestriction.get(sid);
         }
-        String sid = registryName.toString();
-        Restriction restriction = this.entityRestriction.get(sid);
         if (restriction == null) {
             return false;
         }
