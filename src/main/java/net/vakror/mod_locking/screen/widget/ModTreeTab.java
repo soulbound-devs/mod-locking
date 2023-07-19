@@ -187,9 +187,13 @@ public class ModTreeTab {
     }
 
     public void scroll(double p_97152_, double p_97153_) {
-        this.scrollX = Mth.clamp(this.scrollX + p_97152_, -(this.maxX), 0.0D);
+        if (this.maxX - this.minX > (screen.width - getMarginX() * 2 - 2 * 9)) {
+            this.scrollX = Mth.clamp(this.scrollX + p_97152_, (double)(-(this.maxX - 234)), 0.0D);
+        }
 
-        this.scrollY = Mth.clamp(this.scrollY + p_97153_, -(this.maxY), 0.0D);
+        if (this.maxY - this.minY > (screen.height - getMarginY() * 2)) {
+            this.scrollY = Mth.clamp(this.scrollY + p_97153_, (double)(-(this.maxY - 113)), 0.0D);
+        }
     }
 
     public void addUnlock(Unlock unlock) {
