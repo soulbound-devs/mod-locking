@@ -59,6 +59,27 @@ public class ModUnlock extends Unlock<ModUnlock>{
     }
 
     @Override
+    public <P> boolean restricts(P item, Restriction.Type restrictionType, boolean a) {
+        if (!this.restriction.doesRestrict(restrictionType)) {
+            return false;
+        }
+        ResourceLocation registryName = null;
+        if (item instanceof Item) {
+            registryName = ForgeRegistries.ITEMS.getKey((Item) item);
+        }
+        if (item instanceof Block) {
+            registryName = ForgeRegistries.BLOCKS.getKey((Block) item);
+        }
+        if (item instanceof EntityType<?>) {
+            registryName = ForgeRegistries.ENTITY_TYPES.getKey((EntityType<?>) item);
+        }
+        if (registryName == null) {
+            return false;
+        }
+        return this.modIds.contains(registryName.getNamespace());
+    }
+
+    @Override
     public boolean restricts(Block block, Restriction.Type restrictionType) {
         if (!this.restriction.doesRestrict(restrictionType)) {
             return false;

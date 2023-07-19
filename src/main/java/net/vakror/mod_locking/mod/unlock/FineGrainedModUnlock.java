@@ -62,38 +62,30 @@ public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
     }
 
     @Override
-    public boolean restricts(Item item, Restriction.Type restrictionType) {
-        ResourceLocation registryName = ForgeRegistries.ITEMS.getKey(item);
+    public <P> boolean restricts(P item, Restriction.Type restrictionType, boolean a) {
+        ResourceLocation registryName = null;
+        if (item instanceof Item) {
+            registryName = ForgeRegistries.ITEMS.getKey((Item) item);
+        }
+        if (item instanceof Block) {
+            registryName = ForgeRegistries.BLOCKS.getKey((Block) item);
+        }
+        if (item instanceof EntityType<?>) {
+            registryName = ForgeRegistries.ENTITY_TYPES.getKey((EntityType<?>) item);
+        }
         if (registryName == null) {
             return false;
         }
         String sid = registryName.toString();
-        Restriction restriction = this.itemRestriction.get(sid);
-        if (restriction == null) {
-            return false;
+        Restriction restriction = null;
+        if (item instanceof Item) {
+            restriction = this.itemRestriction.get(sid);
         }
-        return restriction.doesRestrict(restrictionType);
-    }
-
-    @Override
-    public boolean restricts(Block block, Restriction.Type restrictionType) {
-        ResourceLocation registryName = ForgeRegistries.BLOCKS.getKey(block);
-        if (registryName == null) {
-            return false;
+        if (item instanceof Block) {
+            restriction = this.blockRestriction.get(sid);
         }
-        String sid = registryName.toString();
-        Restriction restriction = this.blockRestriction.get(sid);
-        if (restriction == null) {
-            return false;
-        }
-        return restriction.doesRestrict(restrictionType);
-    }
-
-    @Override
-    public boolean restricts(EntityType<?> entityType, Restriction.Type restrictionType) {
-        ResourceLocation registryName = ForgeRegistries.ENTITY_TYPES.getKey(entityType);
-        if (registryName == null) {
-            return false;
+        if (item instanceof EntityType<?>) {
+            restriction = this.entityRestriction.get(sid);
         }
         String sid = registryName.toString();
         Restriction restriction = this.entityRestriction.get(sid);

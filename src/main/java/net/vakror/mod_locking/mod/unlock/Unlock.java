@@ -164,6 +164,10 @@ public class Unlock<T extends Unlock> {
         return false;
     }
 
+    public <P> boolean restricts(P item, Restriction.Type restrictionType, boolean a) {
+        return false;
+    }
+
     public boolean restricts(Block item, Restriction.Type restrictionType) {
         return false;
     }
