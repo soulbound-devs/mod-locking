@@ -33,6 +33,12 @@ public class ModLockingMod {
 
         ModMenuTypes.register(modEventBus);
 
+        MinecraftForge.EVENT_BUS.addListener(Events::onBlockHit);
+        MinecraftForge.EVENT_BUS.addListener(Events::onEntityInteraction);
+        MinecraftForge.EVENT_BUS.addListener(Events::onBlockInteraction);
+        MinecraftForge.EVENT_BUS.addListener(Events::onPlayerAttack);
+        MinecraftForge.EVENT_BUS.addListener(Events::onEntityDeath);
+        MinecraftForge.EVENT_BUS.addListener(Events::onCommandsRegister);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
