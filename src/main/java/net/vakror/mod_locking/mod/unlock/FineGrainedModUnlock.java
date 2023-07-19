@@ -51,6 +51,12 @@ public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
         return this;
     }
 
+    public FineGrainedModUnlock withBlockItemRestriction(String item, boolean restricted) {
+        this.itemRestriction.put(item, Restriction.defaultItemRestrictions(restricted));
+        this.blockRestriction.put(item, Restriction.defaultBlockRestrictions(restricted));
+        return this;
+    }
+
     public FineGrainedModUnlock withBlockRestriction(String block, boolean restricted) {
         this.blockRestriction.put(block, Restriction.defaultBlockRestrictions(restricted));
         return this;
