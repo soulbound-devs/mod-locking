@@ -169,7 +169,9 @@ public class Unlock<T extends Unlock> {
 
         list.add(Component.empty());
         if (requiredUnlocks != null && !requiredUnlocks[0].equals("")) {
-            list.add(Component.literal("Requires: §e" + Arrays.toString(requiredUnlocks)));
+            for (String required : requiredUnlocks) {
+                list.add(Component.literal("Requires: §e" + required));
+            }
         }
         list.add(Component.empty());
         list.add(Component.literal(description));
