@@ -33,10 +33,10 @@ public class Unlock<T extends Unlock> {
 
     protected CompoundTag iconNbt;
 
-    public Unlock(String name, Map<String, Integer> costMap, String[] requiredUnlock, float x, float y) {
+    public Unlock(String name, Map<String, Integer> costMap, String[] requiredUnlocks, float x, float y) {
         this.name = name;
         this.cost = costMap;
-        this.requiredUnlocks = requiredUnlock;
+        this.requiredUnlocks = requiredUnlocks;
         this.x = x;
         this.y = y;
     }

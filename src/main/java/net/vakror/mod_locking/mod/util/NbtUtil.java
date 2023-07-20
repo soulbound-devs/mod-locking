@@ -92,21 +92,21 @@ public class NbtUtil {
 
     private static void serializeFineGrainedUnlock(CompoundTag nbt, FineGrainedModUnlock unlock) {
         CompoundTag tag = new CompoundTag();
-        serializeRestriction(tag, unlock.getItemRestriction(), "item");
+        serializeRestriction(tag, unlock.getItemRestrictions(), "item");
         nbt.put("item", tag);
         CompoundTag tag1 = new CompoundTag();
-        serializeRestriction(tag1, unlock.getBlockRestriction(), "block");
+        serializeRestriction(tag1, unlock.getBlockRestrictions(), "block");
         nbt.put("block", tag1);
         CompoundTag tag2 = new CompoundTag();
-        serializeRestriction(tag2, unlock.getEntityRestriction(), "entity");
+        serializeRestriction(tag2, unlock.getEntityRestrictions(), "entity");
         nbt.put("entity", tag2);
     }
 
     private static Unlock deserializeFineGrainedUnlock(CompoundTag nbt, String name, Map<String, Integer> cost, float x, float y,String[] requiredUnlock) {
         FineGrainedModUnlock unlock = new FineGrainedModUnlock(name, cost, x, y,requiredUnlock);
-        unlock.setItemRestriction(deserializeRestriction(nbt.getCompound("item"), "item"));
-        unlock.setBlockRestriction(deserializeRestriction(nbt.getCompound("block"), "block"));
-        unlock.setEntityRestriction(deserializeRestriction(nbt.getCompound("entity"), "entity"));
+        unlock.setItemRestrictions(deserializeRestriction(nbt.getCompound("item"), "item"));
+        unlock.setBlockRestrictions(deserializeRestriction(nbt.getCompound("block"), "block"));
+        unlock.setEntityRestrictions(deserializeRestriction(nbt.getCompound("entity"), "entity"));
         return unlock;
     }
 
@@ -217,6 +217,15 @@ public class NbtUtil {
             }
         }
         throw new IllegalArgumentException("Could Not Find Point Type: " + point);
+    }
+
+    public static ModPoint getPoint(String point, String errorMessage) {
+        for (ModPoint point1: ModConfigs.POINTS.points) {
+            if (point1.name.equals(point)) {
+                return point1;
+            }
+        }
+        throw new IllegalArgumentException(errorMessage);
     }
 
 //    public static List<ModUnlockGroup> deserializeUnlockGroups(CompoundTag nbt) {

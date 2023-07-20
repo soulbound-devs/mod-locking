@@ -12,58 +12,58 @@ import net.vakror.mod_locking.locking.Restriction;
 
 public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
     @Expose
-    protected Map<String, Restriction> itemRestriction = new HashMap<String, Restriction>();
+    protected Map<String, Restriction> itemRestrictions = new HashMap<String, Restriction>();
     @Expose
-    protected Map<String, Restriction> blockRestriction = new HashMap<String, Restriction>();
+    protected Map<String, Restriction> blockRestrictions = new HashMap<String, Restriction>();
     @Expose
-    protected Map<String, Restriction> entityRestriction = new HashMap<String, Restriction>();
+    protected Map<String, Restriction> entityRestrictions = new HashMap<String, Restriction>();
 
-    public FineGrainedModUnlock(String name, Map<String, Integer> cost, float x, float y, String... requiredUnlock) {
-        super(name, cost, requiredUnlock, x, y);
+    public FineGrainedModUnlock(String name, Map<String, Integer> cost, float x, float y, String... requiredUnlocks) {
+        super(name, cost, requiredUnlocks, x, y);
     }
 
-    public Map<String, Restriction> getItemRestriction() {
-        return this.itemRestriction;
+    public Map<String, Restriction> getItemRestrictions() {
+        return this.itemRestrictions;
     }
 
-    public Map<String, Restriction> getBlockRestriction() {
-        return this.blockRestriction;
+    public Map<String, Restriction> getBlockRestrictions() {
+        return this.blockRestrictions;
     }
 
-    public Map<String, Restriction> getEntityRestriction() {
-        return this.entityRestriction;
+    public Map<String, Restriction> getEntityRestrictions() {
+        return this.entityRestrictions;
     }
 
-    public void setItemRestriction(Map<String, Restriction> itemRestriction) {
-        this.itemRestriction = itemRestriction;
+    public void setItemRestrictions(Map<String, Restriction> itemRestrictions) {
+        this.itemRestrictions = itemRestrictions;
     }
 
-    public void setBlockRestriction(Map<String, Restriction> blockRestriction) {
-        this.blockRestriction = blockRestriction;
+    public void setBlockRestrictions(Map<String, Restriction> blockRestrictions) {
+        this.blockRestrictions = blockRestrictions;
     }
 
-    public void setEntityRestriction(Map<String, Restriction> entityRestriction) {
-        this.entityRestriction = entityRestriction;
+    public void setEntityRestrictions(Map<String, Restriction> entityRestrictions) {
+        this.entityRestrictions = entityRestrictions;
     }
 
     public FineGrainedModUnlock withItemRestriction(String item, boolean restricted) {
-        this.itemRestriction.put(item, Restriction.defaultItemRestrictions(restricted));
+        this.itemRestrictions.put(item, Restriction.defaultItemRestrictions(restricted));
         return this;
     }
 
     public FineGrainedModUnlock withBlockItemRestriction(String item, boolean restricted) {
-        this.itemRestriction.put(item, Restriction.defaultItemRestrictions(restricted));
-        this.blockRestriction.put(item, Restriction.defaultBlockRestrictions(restricted));
+        this.itemRestrictions.put(item, Restriction.defaultItemRestrictions(restricted));
+        this.blockRestrictions.put(item, Restriction.defaultBlockRestrictions(restricted));
         return this;
     }
 
     public FineGrainedModUnlock withBlockRestriction(String block, boolean restricted) {
-        this.blockRestriction.put(block, Restriction.defaultBlockRestrictions(restricted));
+        this.blockRestrictions.put(block, Restriction.defaultBlockRestrictions(restricted));
         return this;
     }
 
     public FineGrainedModUnlock withEntityRestriction(String entity, boolean restricted) {
-        this.entityRestriction.put(entity, Restriction.defaultEntityRestrictions(restricted));
+        this.entityRestrictions.put(entity, Restriction.defaultEntityRestrictions(restricted));
         return this;
     }
 
@@ -85,13 +85,13 @@ public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
         String sid = registryName.toString();
         Restriction restriction = null;
         if (item instanceof Item) {
-            restriction = this.itemRestriction.get(sid);
+            restriction = this.itemRestrictions.get(sid);
         }
         if (item instanceof Block) {
-            restriction = this.blockRestriction.get(sid);
+            restriction = this.blockRestrictions.get(sid);
         }
         if (item instanceof EntityType<?>) {
-            restriction = this.entityRestriction.get(sid);
+            restriction = this.entityRestrictions.get(sid);
         }
         if (restriction == null) {
             return false;
