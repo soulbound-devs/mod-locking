@@ -5,12 +5,13 @@ import com.google.gson.GsonBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.vakror.mod_locking.ModLockingMod;
-import net.vakror.mod_locking.mod.unlock.Unlock;
+import net.vakror.mod_locking.mod.config.adapter.CompoundTagAdapter;
+import net.vakror.mod_locking.mod.config.adapter.FineGrainedUnlockAdapter;
+import net.vakror.mod_locking.mod.config.adapter.ModUnlockAdapter;
+import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
+import net.vakror.mod_locking.mod.unlock.ModUnlock;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 
 public abstract class Config {
@@ -52,7 +53,7 @@ public abstract class Config {
                 }
                 Config config2 = config;
                 return (T) config2;
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.out.println(e.getClass());
                 e.printStackTrace();
                 ModLockingMod.LOGGER.warn("Config file {} not found, generating new", this);

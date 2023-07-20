@@ -1,4 +1,4 @@
-package net.vakror.mod_locking.mod.config;
+package net.vakror.mod_locking.mod.config.adapter;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

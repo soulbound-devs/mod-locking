@@ -1,6 +1,7 @@
-package net.vakror.mod_locking.mod.config;
+package net.vakror.mod_locking.mod.config.configs;
 
 import com.google.gson.annotations.Expose;
+import net.vakror.mod_locking.mod.config.Config;
 import net.vakror.mod_locking.mod.point.obtain.KillEntityObtainMethod;
 import net.vakror.mod_locking.mod.point.obtain.PointObtainMethod;
 import net.vakror.mod_locking.mod.point.obtain.RightClickItemObtainMethod;

@@ -1,6 +1,8 @@
-package net.vakror.mod_locking.mod.config;
+package net.vakror.mod_locking.mod.config.configs;
 
 import com.google.gson.annotations.Expose;
+import net.vakror.mod_locking.mod.config.Config;
+import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.ModUnlock;
 import net.vakror.mod_locking.mod.unlock.Unlock;
