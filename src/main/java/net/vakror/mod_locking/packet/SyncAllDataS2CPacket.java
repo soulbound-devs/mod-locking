@@ -3,6 +3,7 @@ package net.vakror.mod_locking.packet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.network.NetworkEvent;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
@@ -25,13 +26,15 @@ public class SyncAllDataS2CPacket {
     private final Map<String, Integer> pointColors;
     private final List<Unlock<?>> unlocks;
     private final List<ModTree> trees;
+    private final boolean reloaded;
 
-    public SyncAllDataS2CPacket(Map<String, Integer> pointAmounts, Map<String, String> pointPluralNames, Map<String, Integer> pointColors, List<Unlock<?>> unlocks, List<ModTree> trees) {
+    public SyncAllDataS2CPacket(Map<String, Integer> pointAmounts, Map<String, String> pointPluralNames, Map<String, Integer> pointColors, List<Unlock<?>> unlocks, List<ModTree> trees, boolean reloaded) {
         this.pointAmounts = pointAmounts;
         this.pointPluralNames = pointPluralNames;
         this.pointColors = pointColors;
         this.unlocks = unlocks;
         this.trees = trees;
+        this.reloaded = reloaded;
     }
 
     public SyncAllDataS2CPacket(FriendlyByteBuf buf) {
@@ -41,6 +44,7 @@ public class SyncAllDataS2CPacket {
         pointPluralNames = NbtUtil.deserializePointPluralNames(nbt);
         unlocks = NbtUtil.deserializeUnlocks(nbt);
         trees = NbtUtil.deserializeTrees(nbt);
+        reloaded = buf.readBoolean();
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -49,6 +53,7 @@ public class SyncAllDataS2CPacket {
         NbtUtil.serializeUnlocks(nbt, unlocks);
         NbtUtil.serializeTrees(nbt, trees);
         buf.writeNbt(nbt);
+        buf.writeBoolean(reloaded);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> sup) {
@@ -71,6 +76,9 @@ public class SyncAllDataS2CPacket {
                     ModConfigs.UNLOCKS.modUnlocks.add(modUnlock);
                 }
             }));
+            if (reloaded) {
+                Minecraft.getInstance().player.sendSystemMessage(Component.literal("Successfully Reloaded All Mod Locks!"));
+            }
         });
         return true;
     }
