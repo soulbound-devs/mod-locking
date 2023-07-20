@@ -7,11 +7,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
+import net.vakror.mod_locking.mod.capability.ModTreeCapability;
+import net.vakror.mod_locking.mod.capability.ModTreeProvider;
+import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 import net.vakror.mod_locking.mod.util.NbtUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,13 +27,11 @@ public class ModUnlockingMenu extends AbstractContainerMenu {
     protected Inventory playerInv;
     protected ModUnlockingMenu(int syncId, Inventory inv, FriendlyByteBuf data) {
         super(ModMenuTypes.UNLOCK_TREE.get(), syncId);
-        CompoundTag nbt = data.readNbt();
-        assert nbt != null;
-        this.unlocks = NbtUtil.deserializeUnlocks(nbt);
-        this.trees = NbtUtil.deserializeTrees(nbt);
-        this.playerPoints = NbtUtil.deserializePoints(nbt);
-        this.pointColors = NbtUtil.deserializePointColors(nbt.getCompound("allPoints"));
         this.playerInv = inv;
+        this.trees = ModConfigs.TREES.trees;
+        this.playerPoints = inv.player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints();
+        this.pointColors = inv.player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPointColors();
+        this.unlocks = ModConfigs.UNLOCKS.getAll();
     }
     protected ModUnlockingMenu(int syncId, Inventory inv, List<Unlock<?>> unlocks, List<ModTree> trees, Map<String, Integer> playerPoints) {
         super(ModMenuTypes.UNLOCK_TREE.get(), syncId);
@@ -40,6 +42,10 @@ public class ModUnlockingMenu extends AbstractContainerMenu {
     }
 
     public Map<String, Integer> getPointColors() {
+        Map<String, Integer> pointColors = new HashMap<>();
+        ModConfigs.POINTS.points.forEach((point -> {
+            pointColors.put(point.name, point.getColor());
+        }));
         return pointColors;
     }
 

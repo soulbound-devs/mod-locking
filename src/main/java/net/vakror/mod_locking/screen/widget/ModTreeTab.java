@@ -61,7 +61,7 @@ public class ModTreeTab {
         this.page = page;
     }
 
-    public void setRootUnlocks(Map<Unlock, ModWidget> unlocks) {
+    public void setRootUnlocks(Map<Unlock<?>, ModWidget> unlocks) {
         this.rootUnlocks = unlocks.values().stream().toList();
         this.widgets.putAll(unlocks);
 
@@ -196,12 +196,12 @@ public class ModTreeTab {
         }
     }
 
-    public void addUnlock(Unlock unlock) {
+    public void addUnlock(Unlock<?> unlock) {
         ModWidget modWidget = new ModWidget(this, this.minecraft, unlock);
         this.addWidget(modWidget, unlock);
     }
 
-    private void addWidget(ModWidget modWidget, Unlock unlock) {
+    private void addWidget(ModWidget modWidget, Unlock<?> unlock) {
         this.widgets.put(unlock, modWidget);
         int i = modWidget.getX();
         int j = i + 28;

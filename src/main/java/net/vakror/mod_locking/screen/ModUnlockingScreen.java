@@ -65,17 +65,17 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         super.init();
         this.tabs.clear();
 
-        List<Unlock> roots = new ArrayList<>(this.menu.unlocks.size());
-        List<Unlock> nonRoots = new ArrayList<>(this.menu.unlocks.size());
-        for (Unlock unlock: this.menu.unlocks) {
-            if (unlock.getParents() == null || unlock.getRequiredUnlocks().equals("")) {
+        List<Unlock<?>> roots = new ArrayList<>(this.menu.unlocks.size());
+        List<Unlock<?>> nonRoots = new ArrayList<>(this.menu.unlocks.size());
+        for (Unlock<?> unlock: this.menu.unlocks) {
+            if (unlock.getParents() == null || unlock.getRequiredUnlocks()[0].equals("")) {
                 roots.add(unlock);
             } else {
                 nonRoots.add(unlock);
             }
         }
         onAddUnlockRoots(roots, true);
-        for (Unlock nonRoot: nonRoots) {
+        for (Unlock<?> nonRoot: nonRoots) {
             onAddNonRootUnlock(nonRoot);
         }
 
@@ -244,10 +244,10 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         }
     }
 
-    public void onAddUnlockRoots(List<Unlock> unlock, boolean a) {
+    public void onAddUnlockRoots(List<Unlock<?>> unlock, boolean a) {
         for (int i = 0; i < this.menu.trees.size(); i++) {
-            List<Unlock> unlocks = new ArrayList<>(unlock.size());
-            for (Unlock unlock1: unlock) {
+            List<Unlock<?>> unlocks = new ArrayList<>(unlock.size());
+            for (Unlock<?> unlock1: unlock) {
                 if (unlock1.getTree().equals(this.menu.trees.get(i).name)) {
                     unlocks.add(unlock1);
                 }
@@ -256,15 +256,15 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         }
     }
 
-    public void onAddUnlockRoots(List<Unlock> unlock) {
+    public void onAddUnlockRoots(List<Unlock<?>> unlock) {
         ModTreeTab treeTab = ModTreeTab.create(this.minecraft, this, this.tabs.size(), this.menu.trees.get(this.tabs.size()));
         List<ModWidget> root = new ArrayList<>(unlock.size());
         assert treeTab != null;
-        for (Unlock unlock1: unlock) {
+        for (Unlock<?> unlock1: unlock) {
             assert this.minecraft != null;
             root.add(new ModWidget(treeTab, this.minecraft, unlock1));
         }
-        Map<Unlock, ModWidget> unlockModWidgetMap = new HashMap<>(unlock.size());
+        Map<Unlock<?>, ModWidget> unlockModWidgetMap = new HashMap<>(unlock.size());
         for (int i = 0; i < unlock.size(); i++) {
             unlockModWidgetMap.put(unlock.get(i), root.get(i));
         }

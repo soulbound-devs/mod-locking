@@ -49,7 +49,7 @@ public class ModWidget {
     private final int x;
     private final int y;
 
-    public ModWidget(ModTreeTab treeTab, Minecraft minecraft, Unlock unlock) {
+    public ModWidget(ModTreeTab treeTab, Minecraft minecraft, Unlock<?> unlock) {
         this.tab = treeTab;
         this.unlock = unlock;
         this.minecraft = minecraft;
