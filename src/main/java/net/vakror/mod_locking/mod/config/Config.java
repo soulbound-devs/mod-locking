@@ -15,7 +15,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 
 public abstract class Config {
-    private static final Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().registerTypeAdapter(CompoundTag.class, CompoundTagAdapter.INSTANCE).setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().registerTypeAdapter(CompoundTag.class, CompoundTagAdapter.INSTANCE).registerTypeAdapter(ModUnlock.class, ModUnlockAdapter.INSTANCE).registerTypeAdapter(FineGrainedModUnlock.class, FineGrainedUnlockAdapter.INSTANCE).setPrettyPrinting().create();
 
     public void generateConfig() {
         this.reset();
