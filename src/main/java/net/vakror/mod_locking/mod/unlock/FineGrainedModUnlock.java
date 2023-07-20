@@ -18,7 +18,7 @@ public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
     @Expose
     protected Map<String, Restriction> entityRestriction = new HashMap<String, Restriction>();
 
-    public FineGrainedModUnlock(String name, Map<String, Integer> cost, float x, float y, String requiredUnlock) {
+    public FineGrainedModUnlock(String name, Map<String, Integer> cost, float x, float y, String... requiredUnlock) {
         super(name, cost, requiredUnlock, x, y);
     }
 

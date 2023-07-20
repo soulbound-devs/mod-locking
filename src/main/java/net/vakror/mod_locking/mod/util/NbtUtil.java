@@ -6,8 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.point.ModPoint;
-import net.vakror.mod_locking.mod.point.obtain.PointObtainMethod;
-import net.vakror.mod_locking.mod.point.obtain.RightClickItemObtainMethod;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.ModUnlock;
@@ -42,7 +40,7 @@ public class NbtUtil {
         return trees;
     }
 
-    public static void serializeUnlocks(CompoundTag nbt, List<Unlock> unlocks) {
+    public static void serializeUnlocks(CompoundTag nbt, List<Unlock<?>> unlocks) {
         String[] unlockNames = new String[unlocks.size()];
 
         final int[] i = {0};
@@ -55,10 +53,10 @@ public class NbtUtil {
         nbt.putString("unlockNames", Arrays.toString(unlockNames));
     }
 
-    public static List<Unlock> deserializeUnlocks(CompoundTag nbt) {
+    public static List<Unlock<?>> deserializeUnlocks(CompoundTag nbt) {
         String[] unlockNames = toArray(nbt.getString("unlockNames"));
 
-        List<Unlock> unlocks = new ArrayList<>(unlockNames.length);
+        List<Unlock<?>> unlocks = new ArrayList<>(unlockNames.length);
         Arrays.stream(unlockNames).forEach((unlockName -> {
             unlocks.add(deserializeUnlock(nbt.getCompound("unlock_" + unlockName)));
         }));
@@ -67,8 +65,8 @@ public class NbtUtil {
     }
 
     public static Unlock deserializeUnlock(CompoundTag compound) {
-        return (compound.getString("type").equals("mod") ? deserializeModUnlock(compound.getString("name"), compound, deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock")):
-                deserializeFineGrainedUnlock(compound, compound.getString("name"), deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), compound.getString("requiredUnlock"))).withDescription(Component.literal(compound.getString("description"))).withIcon(compound.getString("icon")).withIconNbt(compound.getCompound("iconNbt")).withTree(compound.getString("tree"));
+        return (compound.getString("type").equals("mod") ? deserializeModUnlock(compound.getString("name"), compound, deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), toArray(compound.getString("requiredUnlock"))):
+                deserializeFineGrainedUnlock(compound, compound.getString("name"), deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), toArray(compound.getString("requiredUnlock")))).withDescription(Component.literal(compound.getString("description"))).withIcon(compound.getString("icon")).withIconNbt(compound.getCompound("iconNbt")).withTree(compound.getString("tree"));
     }
 
     public static CompoundTag serializeUnlock(Unlock unlock) {
@@ -82,7 +80,7 @@ public class NbtUtil {
         nbt.putString("icon", unlock.getIcon());
         nbt.putString("tree", unlock.getTree());
         nbt.put("iconNbt", (unlock.getIconNbt() == null ? new CompoundTag(): unlock.getIconNbt()));
-        nbt.putString("requiredUnlock", (unlock.getRequiredUnlock() == null ? "": unlock.getRequiredUnlock()));
+        nbt.putString("requiredUnlock", (unlock.getRequiredUnlocks() == null ? "": Arrays.toString(unlock.getRequiredUnlocks())));
         serializePoints(nbt, unlock.getCost());
         if (unlock instanceof ModUnlock modUnlock) {
             serializeModUnlock(nbt, modUnlock);
@@ -104,7 +102,7 @@ public class NbtUtil {
         nbt.put("entity", tag2);
     }
 
-    private static Unlock deserializeFineGrainedUnlock(CompoundTag nbt, String name, Map<String, Integer> cost, float x, float y,String requiredUnlock) {
+    private static Unlock deserializeFineGrainedUnlock(CompoundTag nbt, String name, Map<String, Integer> cost, float x, float y,String[] requiredUnlock) {
         FineGrainedModUnlock unlock = new FineGrainedModUnlock(name, cost, x, y,requiredUnlock);
         unlock.setItemRestriction(deserializeRestriction(nbt.getCompound("item"), "item"));
         unlock.setBlockRestriction(deserializeRestriction(nbt.getCompound("block"), "block"));
@@ -132,7 +130,7 @@ public class NbtUtil {
         serializeRestrictions(nbt, unlock.getRestriction());
     }
 
-    private static ModUnlock deserializeModUnlock(String name, CompoundTag nbt, Map<String, Integer> cost, float x, float y, String requiredUnlock) {
+    private static ModUnlock deserializeModUnlock(String name, CompoundTag nbt, Map<String, Integer> cost, float x, float y, String[] requiredUnlock) {
         return new ModUnlock(name, cost, requiredUnlock, x, y, toArray(nbt.getString("modIds")));
     }
 

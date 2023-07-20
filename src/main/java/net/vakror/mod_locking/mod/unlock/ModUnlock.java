@@ -19,8 +19,13 @@ public class ModUnlock extends Unlock<ModUnlock>{
     @Expose
     protected Restriction restriction = Restriction.defaultRestrictions(true);
 
-    public ModUnlock(String name, Map<String, Integer> costMap, String requiredUnlocks, float x, float y,String ... modIds) {
+    public ModUnlock(String name, Map<String, Integer> costMap, String[] requiredUnlocks, float x, float y,String ... modIds) {
         super(name, costMap, requiredUnlocks, x, y);
+        Collections.addAll(this.modIds, modIds);
+    }
+
+    public ModUnlock(String name, Map<String, Integer> costMap, String requiredUnlock, float x, float y,String ... modIds) {
+        super(name, costMap, requiredUnlock, x, y);
         Collections.addAll(this.modIds, modIds);
     }
 

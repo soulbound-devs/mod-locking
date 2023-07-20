@@ -7,9 +7,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.vakror.mod_locking.mod.tree.ModTree;
-import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
-import net.vakror.mod_locking.mod.unlock.ModUnlock;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 import net.vakror.mod_locking.screen.widget.ModTreeTab;
 import net.vakror.mod_locking.screen.widget.ModWidget;
@@ -71,7 +68,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         List<Unlock> roots = new ArrayList<>(this.menu.unlocks.size());
         List<Unlock> nonRoots = new ArrayList<>(this.menu.unlocks.size());
         for (Unlock unlock: this.menu.unlocks) {
-            if (unlock.getParent() == null || unlock.getRequiredUnlock().equals("")) {
+            if (unlock.getParents() == null || unlock.getRequiredUnlocks().equals("")) {
                 roots.add(unlock);
             } else {
                 nonRoots.add(unlock);
@@ -289,13 +286,13 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     }
 
     @Nullable
-    private ModTreeTab getTab(Unlock unlock) {
-        while(unlock.getParent() != null) {
-            unlock = unlock.getParent();
+    private ModTreeTab getTab(Unlock<?> unlock) {
+        while(unlock.getParents() != null && unlock.getParents().get(0) != null) {
+            unlock = unlock.getParents().get(0);
         }
 
         AtomicReference<ModTreeTab> tab = new AtomicReference<>();
-        Unlock finalUnlock = unlock;
+        Unlock<?> finalUnlock = unlock;
         this.tabs.forEach(((modWidgets, modTreeTab) -> {
             for (ModWidget widget: modWidgets) {
                 if (widget.getUnlock().getName().equals(finalUnlock.getName())) {

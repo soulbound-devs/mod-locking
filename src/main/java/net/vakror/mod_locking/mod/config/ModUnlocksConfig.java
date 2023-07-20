@@ -18,8 +18,8 @@ public class ModUnlocksConfig extends Config {
         return "unlocks";
     }
 
-    public List<Unlock> getAll() {
-        List<Unlock> all = new ArrayList<>();
+    public List<Unlock<?>> getAll() {
+        List<Unlock<?>> all = new ArrayList<>();
         all.addAll(modUnlocks);
         all.addAll(fineGrainedUnlocks);
         return all;
@@ -28,13 +28,13 @@ public class ModUnlocksConfig extends Config {
     protected void reset() {
     }
 
-    public Map<String, Integer> createCostMap(String point, int count) {
+    public static Map<String, Integer> createCostMap(String point, int count) {
         Map<String, Integer> hashMap = new HashMap<>();
         hashMap.put(point, count);
         return hashMap;
     }
 
-    public Map<String, Integer> createCostMap(String point, String point1, int count, int count1) {
+    public static Map<String, Integer> createCostMap(String point, String point1, int count, int count1) {
         Map<String, Integer> hashMap = new HashMap<>();
         hashMap.put(point, count);
         hashMap.put(point1, count1);

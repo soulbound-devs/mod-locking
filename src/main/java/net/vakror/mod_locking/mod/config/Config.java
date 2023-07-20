@@ -40,23 +40,28 @@ public abstract class Config {
         return this.getName();
     }
 
-    public <T extends Config> T readConfig() {
-        ModLockingMod.LOGGER.info("Reading config: " + this.getName());
-        try (FileReader reader = new FileReader(this.getConfigFile())){
-            Config config = GSON.fromJson(reader, this.getClass());
-            config.onLoad(this);
-            if (!config.isValid()) {
-                ModLockingMod.LOGGER.error("Invalid config {}, using defaults", this);
-                config.reset();
+    public <T extends Config> T readConfig(boolean overrideCurrent) {
+        if (!overrideCurrent) {
+            ModLockingMod.LOGGER.info("Reading config: " + this.getName());
+            try (FileReader reader = new FileReader(this.getConfigFile())) {
+                Config config = GSON.fromJson(reader, this.getClass());
+                config.onLoad(this);
+                if (!config.isValid()) {
+                    ModLockingMod.LOGGER.error("Invalid config {}, using defaults", this);
+                    config.reset();
+                }
+                Config config2 = config;
+                return (T) config2;
+            } catch (Exception e) {
+                System.out.println(e.getClass());
+                e.printStackTrace();
+                ModLockingMod.LOGGER.warn("Config file {} not found, generating new", this);
+                this.generateConfig();
+                return (T) this;
             }
-            Config config2 = config;
-            return (T)config2;
-        }
-        catch (Exception e) {
-            System.out.println(e.getClass());
-            e.printStackTrace();
-            ModLockingMod.LOGGER.warn("Config file {} not found, generating new", this);
+        } else {
             this.generateConfig();
+            ModLockingMod.LOGGER.info("Successfully Overwrote Config: " + this.getName());
             return (T) this;
         }
     }

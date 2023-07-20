@@ -39,6 +39,7 @@ public class ModLockingMod {
         MinecraftForge.EVENT_BUS.addListener(Events::onPlayerAttack);
         MinecraftForge.EVENT_BUS.addListener(Events::onEntityDeath);
         MinecraftForge.EVENT_BUS.addListener(Events::onCommandsRegister);
+        MinecraftForge.EVENT_BUS.addListener(Events::onPlayerLogIn);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -46,7 +47,7 @@ public class ModLockingMod {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        ModConfigs.register();
+        ModConfigs.register(false);
         event.enqueueWork((ModPackets::register));
     }
 

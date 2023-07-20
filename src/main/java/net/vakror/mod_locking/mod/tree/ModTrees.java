@@ -12,11 +12,6 @@ import java.util.List;
 
 public class ModTrees {
     public static List<ModTree> getUnlockTrees(Player player) {
-        if (!player.level().isClientSide) {
-            ModPackets.sendToClient(new SyncModTreesS2CPacket(player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees()), (ServerPlayer) player);
-        } else {
-            ModPackets.sendToServer(new RequestTreeUpdateC2SPacket());
-        }
         return player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees();
     }
 }

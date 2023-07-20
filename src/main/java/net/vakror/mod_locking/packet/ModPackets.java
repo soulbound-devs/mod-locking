@@ -49,6 +49,18 @@ public class ModPackets {
                 .encoder(SyncModTreesS2CPacket::encode)
                 .consumerNetworkThread(SyncModTreesS2CPacket::handle)
                 .add();
+
+        net.messageBuilder(SyncAllDataS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncAllDataS2CPacket::new)
+                .encoder(SyncAllDataS2CPacket::encode)
+                .consumerNetworkThread(SyncAllDataS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(RequestAllDataC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(RequestAllDataC2SPacket::new)
+                .encoder(RequestAllDataC2SPacket::encode)
+                .consumerNetworkThread(RequestAllDataC2SPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG packet) {

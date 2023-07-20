@@ -2,25 +2,21 @@ package net.vakror.mod_locking.screen.widget;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.FrameType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.advancements.AdvancementWidgetType;
-import net.minecraft.locale.Language;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.vakror.mod_locking.mod.unlock.Unlock;
-import net.vakror.mod_locking.mod.util.NbtUtil;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,7 +42,7 @@ public class ModWidget {
     private final List<Component> description;
     private final Minecraft minecraft;
     @Nullable
-    private ModWidget parent;
+    private List<ModWidget> parents;
     private final List<ModWidget> children = Lists.newArrayList();
     @Nullable
     private boolean isDone;
@@ -80,42 +76,47 @@ public class ModWidget {
     }
 
     @Nullable
-    private ModWidget getFirstVisibleParent(Unlock unlock) {
-        unlock = unlock.getParent();
-
-        ModWidget w = this.tab.getWidget(unlock);
-        int a = 0;
-        return unlock != null ? this.tab.getWidget(unlock) : null;
-    }
-
-    public void drawConnectivity(GuiGraphics graphics, int x, int y, boolean shadow) {
-        if (this.parent != null) {
-            int i = x + this.parent.x + 13;
-            int j = x + this.parent.x + 26 + 4;
-            int k = y + this.parent.y + 13;
-            int l = x + this.x + 13;
-            int i1 = y + this.y + 13;
-            int j1 = shadow ? -16777216 : -1;
-            if (shadow) {
-                graphics.hLine(j, i, k - 1, j1);
-                graphics.hLine(j + 1, i, k, j1);
-                graphics.hLine(j, i, k + 1, j1);
-                graphics.hLine(l, j - 1, i1 - 1, j1);
-                graphics.hLine(l, j - 1, i1, j1);
-                graphics.hLine(l, j - 1, i1 + 1, j1);
-                graphics.vLine(j - 1, i1, k, j1);
-                graphics.vLine(j + 1, i1, k, j1);
-            } else {
-                graphics.hLine(j, i, k, j1);
-                graphics.hLine(l, j, i1, j1);
-                graphics.vLine(j, i1, k, j1);
+    private List<ModWidget> getParents(Unlock<?> unlock) {
+        List<ModWidget> parents = new ArrayList<>();
+        if (unlock.getParents() != null) {
+            for (Unlock<?> parent: unlock.getParents()) {
+                if (parent != null) {
+                    parents.add(this.tab.getWidget(parent));
+                }
             }
         }
 
-        for(ModWidget widget : this.children) {
+        return parents.isEmpty() ? null : parents;
+    }
+
+    public void drawConnectivity(GuiGraphics graphics, int x, int y, boolean shadow) {
+        if (this.parents != null) {
+            for (ModWidget parent : this.parents) {
+                int i = x + parent.x + 13;
+                int j = x + parent.x + 26 + 4;
+                int k = y + parent.y + 13;
+                int l = x + this.x + 13;
+                int i1 = y + this.y + 13;
+                int j1 = shadow ? -16777216 : -1;
+                if (shadow) {
+                    graphics.hLine(j, i, k - 1, j1);
+                    graphics.hLine(j + 1, i, k, j1);
+                    graphics.hLine(j, i, k + 1, j1);
+                    graphics.hLine(l, j - 1, i1 - 1, j1);
+                    graphics.hLine(l, j - 1, i1, j1);
+                    graphics.hLine(l, j - 1, i1 + 1, j1);
+                    graphics.vLine(j - 1, i1, k, j1);
+                    graphics.vLine(j + 1, i1, k, j1);
+                } else {
+                    graphics.hLine(j, i, k, j1);
+                    graphics.hLine(l, j, i1, j1);
+                    graphics.vLine(j, i1, k, j1);
+                }
+            }
+        }
+        for (ModWidget widget : this.children) {
             widget.drawConnectivity(graphics, x, y, shadow);
         }
-
     }
 
     public void draw(GuiGraphics graphics, int x, int y) {
@@ -146,7 +147,6 @@ public class ModWidget {
         this.children.add(p_97307_);
     }
     public Unlock getUnlock() {
-
         return unlock;
     }
 
@@ -223,10 +223,10 @@ public class ModWidget {
     }
 
     public void attachToParent() {
-        if (this.parent == null && this.unlock.getParent() != null) {
-            this.parent = this.getFirstVisibleParent(this.unlock);
-            if (this.parent != null) {
-                this.parent.addChild(this);
+        if (this.parents == null && this.unlock.getParents() != null) {
+            this.parents = this.getParents(this.unlock);
+            if (this.parents != null) {
+                this.parents.forEach((parent) -> parent.addChild(this));
             }
         }
     }

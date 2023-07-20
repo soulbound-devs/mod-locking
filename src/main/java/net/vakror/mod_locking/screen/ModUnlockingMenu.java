@@ -19,7 +19,7 @@ public class ModUnlockingMenu extends AbstractContainerMenu {
     protected List<ModTree> trees;
     protected Map<String, Integer> playerPoints;
     protected Map<String, Integer> pointColors;
-    protected List<Unlock> unlocks;
+    protected List<Unlock<?>> unlocks;
     protected Inventory playerInv;
     protected ModUnlockingMenu(int syncId, Inventory inv, FriendlyByteBuf data) {
         super(ModMenuTypes.UNLOCK_TREE.get(), syncId);
@@ -31,7 +31,7 @@ public class ModUnlockingMenu extends AbstractContainerMenu {
         this.pointColors = NbtUtil.deserializePointColors(nbt.getCompound("allPoints"));
         this.playerInv = inv;
     }
-    protected ModUnlockingMenu(int syncId, Inventory inv, List<Unlock> unlocks, List<ModTree> trees, Map<String, Integer> playerPoints) {
+    protected ModUnlockingMenu(int syncId, Inventory inv, List<Unlock<?>> unlocks, List<ModTree> trees, Map<String, Integer> playerPoints) {
         super(ModMenuTypes.UNLOCK_TREE.get(), syncId);
         this.unlocks = unlocks;
         this.trees = trees;

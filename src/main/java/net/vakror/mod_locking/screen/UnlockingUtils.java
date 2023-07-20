@@ -31,23 +31,6 @@ public class UnlockingUtils {
             public @NotNull AbstractContainerMenu createMenu(int syncId, @NotNull Inventory inv, @NotNull Player player) {
                 return new ModUnlockingMenu(syncId, inv, ModConfigs.UNLOCKS.getAll(), ModConfigs.TREES.trees, player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints());
             }
-        }, (buf -> {
-            CompoundTag tag = new CompoundTag();
-            CompoundTag allPointsTag = new CompoundTag();
-            NbtUtil.serializeUnlocks(tag, ModConfigs.UNLOCKS.getAll());
-            NbtUtil.serializeTrees(tag, ModConfigs.TREES.trees);
-            NbtUtil.serializePoints(tag, player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints());
-            Map<String, Integer> allPoints = new HashMap<>(ModConfigs.POINTS.points.size());
-            ModConfigs.POINTS.points.forEach((point -> {
-                allPoints.put(point.name, 1);
-            }));
-            NbtUtil.serializePoints(allPointsTag, allPoints);
-            tag.put("allPoints", allPointsTag);
-            buf.writeNbt(tag);
-            FriendlyByteBuf output = new FriendlyByteBuf(Unpooled.buffer());
-            output.writeVarInt(buf.readableBytes());
-            output.writeBytes(buf);
-            ModLockingMod.LOGGER.debug("Sent Bytes: " + output.readableBytes());
-        }));
+        });
     }
 }

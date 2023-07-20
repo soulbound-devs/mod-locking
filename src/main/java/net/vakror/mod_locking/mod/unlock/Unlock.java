@@ -9,12 +9,12 @@ import net.minecraft.world.level.block.Block;
 import net.vakror.mod_locking.Tooltip;
 import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.config.ModConfigs;
-import net.vakror.mod_locking.mod.config.Unlocks;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.util.NbtUtil;
 import net.vakror.mod_locking.screen.ModUnlockingScreen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,7 +23,7 @@ public class Unlock<T extends Unlock> {
     protected String name;
     protected Map<String, Integer> cost;
 
-    protected String requiredUnlock;
+    protected String[] requiredUnlocks;
 
     protected float x;
     protected float y;
@@ -33,10 +33,18 @@ public class Unlock<T extends Unlock> {
 
     protected CompoundTag iconNbt;
 
+    public Unlock(String name, Map<String, Integer> costMap, String[] requiredUnlock, float x, float y) {
+        this.name = name;
+        this.cost = costMap;
+        this.requiredUnlocks = requiredUnlock;
+        this.x = x;
+        this.y = y;
+    }
+
     public Unlock(String name, Map<String, Integer> costMap, String requiredUnlock, float x, float y) {
         this.name = name;
         this.cost = costMap;
-        this.requiredUnlock = requiredUnlock;
+        this.requiredUnlocks = new String[]{requiredUnlock};
         this.x = x;
         this.y = y;
     }
@@ -44,7 +52,7 @@ public class Unlock<T extends Unlock> {
     public Unlock(String name, Map<String, Integer> costMap, float x, float y) {
         this.name = name;
         this.cost = costMap;
-        this.requiredUnlock = "";
+        this.requiredUnlocks = new String[]{""};
         this.x = x;
         this.y =y;
     }
@@ -87,14 +95,22 @@ public class Unlock<T extends Unlock> {
         return tree;
     }
 
-    public Unlock getParent() {
-        if (this.requiredUnlock == null || this.requiredUnlock.equals("")) {
+    public List<Unlock<?>> getParents() {
+        if (this.requiredUnlocks == null || this.requiredUnlocks.length == 0 || this.requiredUnlocks[0].equals("")) {
             return null;
         }
-        for (Unlock unlock: ModConfigs.UNLOCKS.getAll()) {
-            if (unlock.getName().equals(this.requiredUnlock)) {
-                return unlock;
+
+        List<Unlock<?>> unlocks = new ArrayList<>();
+
+        for (Unlock<?> unlock: ModConfigs.UNLOCKS.getAll()) {
+            for (String requiredUnlock: this.requiredUnlocks) {
+                if (unlock.getName().equals(requiredUnlock)) {
+                    unlocks.add(unlock);
+                }
             }
+        }
+        if (unlocks.size() > 0) {
+            return unlocks;
         }
         return null;
     }
@@ -107,8 +123,8 @@ public class Unlock<T extends Unlock> {
         return iconNbt;
     }
 
-    public String getRequiredUnlock() {
-        return requiredUnlock;
+    public String[] getRequiredUnlocks() {
+        return requiredUnlocks;
     }
 
     public float getX() {
@@ -152,8 +168,8 @@ public class Unlock<T extends Unlock> {
         }
 
         list.add(Component.empty());
-        if (requiredUnlock != null && !requiredUnlock.equals("")) {
-            list.add(Component.literal("Requires: §e" + requiredUnlock));
+        if (requiredUnlocks != null && !requiredUnlocks[0].equals("")) {
+            list.add(Component.literal("Requires: §e" + Arrays.toString(requiredUnlocks)));
         }
         list.add(Component.empty());
         list.add(Component.literal(description));

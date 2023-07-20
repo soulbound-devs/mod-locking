@@ -13,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -34,6 +35,8 @@ import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.tree.ModTrees;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
+import net.vakror.mod_locking.packet.ModPackets;
+import net.vakror.mod_locking.packet.RequestAllDataC2SPacket;
 
 import java.util.Arrays;
 import java.util.List;
@@ -72,6 +75,10 @@ public class Events {
             event.setCanceled(true);
         }));
         }
+    }
+
+    public static void onPlayerLogIn(ClientPlayerNetworkEvent.LoggingIn event) {
+        ModPackets.sendToServer(new RequestAllDataC2SPacket());
     }
 
     public static void onBlockInteraction(PlayerInteractEvent.RightClickBlock event) {
