@@ -14,8 +14,8 @@ public class ModConfigs {
 
     public static void register(boolean overrideCurrent) {
         TREES = new ModTreesConfig().readConfig(overrideCurrent);
-        UNLOCKS = new ModUnlocksConfig().readConfig(overrideCurrent);
         POINTS = new ModPointsConfig().readConfig(overrideCurrent);
         POINT_OBTAIN_METHODS = new ModPointObtainConfig().readConfig(overrideCurrent);
+        UNLOCKS = new ModUnlocksConfig().readConfig(overrideCurrent);
     }
 }
