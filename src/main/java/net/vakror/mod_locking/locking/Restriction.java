@@ -43,7 +43,6 @@ public class Restriction {
         Restriction restrictions = new Restriction();
         restrictions.restrictions.put(Type.USABILITY, restricted);
         restrictions.restrictions.put(Type.CRAFTABILITY, restricted);
-        restrictions.restrictions.put(Type.HITTABILITY, restricted);
         return restrictions;
     }
 
