@@ -30,6 +30,9 @@ public abstract class SlotMixin {
         if (!this.hasItem()) {
             return;
         }
+        if (player.isCreative()) {
+            return;
+        }
         if (this.mayPlace(this.getItem())) {
             return;
         }
