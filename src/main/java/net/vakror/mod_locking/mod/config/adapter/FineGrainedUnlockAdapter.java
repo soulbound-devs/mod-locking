@@ -41,9 +41,9 @@ JsonDeserializer<FineGrainedModUnlock> {
                 requiredUnlocks
                 );
 
-        unlock.getItemRestrictions().putAll(getRestrictions(unlockObject, "itemRestrictions"));
-        unlock.getBlockRestrictions().putAll(getRestrictions(unlockObject, "blockRestrictions"));
-        unlock.getEntityRestrictions().putAll(getRestrictions(unlockObject, "entityRestrictions"));
+        getRestrictions(unlockObject, "itemRestrictions").forEach(unlock::withItemRestriction);
+        getRestrictions(unlockObject, "blockRestrictions").forEach(unlock::withBlockRestriction);
+        getRestrictions(unlockObject, "entityRestrictions").forEach(unlock::withEntityRestriction);
 
         addDataToUnlock(unlock, unlockObject);
         return unlock;
