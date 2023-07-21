@@ -5,9 +5,11 @@ import com.google.gson.GsonBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.vakror.mod_locking.ModLockingMod;
-import net.vakror.mod_locking.mod.config.adapter.CompoundTagAdapter;
-import net.vakror.mod_locking.mod.config.adapter.FineGrainedUnlockAdapter;
-import net.vakror.mod_locking.mod.config.adapter.ModUnlockAdapter;
+import net.vakror.mod_locking.mod.config.adapter.*;
+import net.vakror.mod_locking.mod.point.ModPoint;
+import net.vakror.mod_locking.mod.point.obtain.KillEntityObtainMethod;
+import net.vakror.mod_locking.mod.point.obtain.RightClickItemObtainMethod;
+import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.ModUnlock;
 
@@ -15,7 +17,15 @@ import java.io.*;
 import java.lang.reflect.Field;
 
 public abstract class Config {
-    private static final Gson GSON = new GsonBuilder().enableComplexMapKeySerialization().registerTypeAdapter(CompoundTag.class, CompoundTagAdapter.INSTANCE).registerTypeAdapter(ModUnlock.class, ModUnlockAdapter.INSTANCE).registerTypeAdapter(FineGrainedModUnlock.class, FineGrainedUnlockAdapter.INSTANCE).setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().enableComplexMapKeySerialization()
+            .registerTypeAdapter(CompoundTag.class, CompoundTagAdapter.INSTANCE)
+            .registerTypeAdapter(ModUnlock.class, ModUnlockAdapter.INSTANCE)
+            .registerTypeAdapter(FineGrainedModUnlock.class, FineGrainedUnlockAdapter.INSTANCE)
+            .registerTypeAdapter(ModPoint.class, ModPointAdapter.INSTANCE)
+            .registerTypeAdapter(ModTree.class, ModTreeAdapter.INSTANCE)
+            .registerTypeAdapter(RightClickItemObtainMethod.class, RightClickItemPointObtainMethodAdapter.INSTANCE)
+            .registerTypeAdapter(KillEntityObtainMethod.class, KillEntityPointObtainMethodAdapter.INSTANCE)
+            .setPrettyPrinting().create();
 
     public void generateConfig() {
         this.reset();

@@ -4,9 +4,11 @@ import com.google.gson.*;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 import net.vakror.mod_locking.ModLockingMod;
 import net.vakror.mod_locking.locking.Restriction;
-import net.vakror.mod_locking.mod.unlock.ModUnlock;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 
 import java.lang.reflect.Type;
@@ -14,13 +16,49 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JsonUtil {
-    public static void addAndAlertIfNull(String name, String unlockName, String value, JsonObject object, boolean warn) {
+    public static void addUnlockAndAlertIfNull(String name, String unlockName, String value, JsonObject object, boolean warn) {
         if (value == null || value.equals("")) {
             if (warn) {
                 ModLockingMod.LOGGER.error(name + " of Unlock " + ((unlockName == null || unlockName.isBlank()) ? "" : unlockName + " ") + "is null or empty!");
             }
         } else {
             object.addProperty(name, value);
+        }
+    }
+
+    public static void addTreeAndAlertIfNull(String name, String treeName, String value, JsonObject object, boolean warn) {
+        if (value == null || value.equals("")) {
+            if (warn) {
+                ModLockingMod.LOGGER.error(name + " of Tree " + ((treeName == null || treeName.isBlank()) ? "" : treeName + " ") + "is null or empty!");
+            }
+        } else {
+            object.addProperty(name, value);
+        }
+    }
+
+    public static void addPointObtainAndAlertIfNull(String name, String value, JsonObject object, boolean warn) {
+        if (value == null || value.equals("")) {
+            if (warn) {
+                ModLockingMod.LOGGER.error(name + " of Point Obtain Method is null or empty!");
+            }
+        } else {
+            object.addProperty(name, value);
+        }
+    }
+
+    public static void addPointAndAlertIfNull(String name, String pointName, String value, JsonObject object, boolean warn) {
+        if (value == null || value.equals("")) {
+            if (warn) {
+                ModLockingMod.LOGGER.error(name + " of Point Type " + ((pointName == null || pointName.isBlank()) ? "" : pointName + " ") + "is null or empty!");
+            }
+        } else {
+            object.addProperty(name, value);
+        }
+    }
+
+    public static void getAndThrowIfNotValidRegistryObject(String string, String message, IForgeRegistry<?> registry) {
+        if (!registry.containsKey(new ResourceLocation(string))) {
+            throw new JsonParseException(message);
         }
     }
 
@@ -91,10 +129,19 @@ public class JsonUtil {
         });
     }
 
+    public static ResourceLocation getAndThrowIfNotResourceLocation(String string, String message) {
+        if (!string.contains(":") || (string.replaceAll("[^_:/a-zA-Z0-9]", "").length() != string.length())) {
+            throw new JsonParseException(message);
+        } else {
+            return new ResourceLocation(string);
+        }
+    }
+
     public static Map<String, Restriction> getRestrictions(JsonObject unlockObject, String name) {
         JsonObject restrictionObject = unlockObject.getAsJsonObject(name);
         Map<String, Restriction> map = new HashMap<>();
         for (String item : restrictionObject.keySet()) {
+            getAndThrowIfNotValidRegistryObject(item, "Unlock Restricted " + (name.equals("itemRestrictions") ? "Item": name.equals("blockRestrictions") ? "Block": "Entity") + " " + item + " Not Valid! Unlock Name: " + unlockObject.get("name").getAsString(), (name.equals("itemRestrictions") ? ForgeRegistries.ITEMS: name.equals("blockRestrictions") ? ForgeRegistries.BLOCKS: ForgeRegistries.ENTITY_TYPES) );
             for (Restriction.Type type : Restriction.Type.values()) {
                 if (restrictionObject.getAsJsonPrimitive(type.toString().toLowerCase()) != null) {
                     JsonPrimitive shouldRestrict = restrictionObject.getAsJsonObject(item).getAsJsonPrimitive(type.toString().toLowerCase());
@@ -110,7 +157,7 @@ public class JsonUtil {
     public static JsonObject serialize(Unlock<?> src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject unlockObject = new JsonObject();
 
-        addAndAlertIfNull("name", src.getName(), src.getName(), unlockObject, true);
+        addUnlockAndAlertIfNull("name", src.getName(), src.getName(), unlockObject, true);
         serializeCost(src.getCost(), unlockObject);
         if (src.getRequiredUnlocks() != null && src.getRequiredUnlocks().length != 0 && !src.getRequiredUnlocks()[0].equals("")) {
             JsonArray requiredUnlocks = new JsonArray();
@@ -122,23 +169,25 @@ public class JsonUtil {
 
         unlockObject.addProperty("x", src.getX());
         unlockObject.addProperty("y", src.getY());
-        addAndAlertIfNull("description", src.getName(), src.getDescription(), unlockObject, true);
-        addAndAlertIfNull("icon", src.getName(), src.getIcon(), unlockObject, true);
-        addAndAlertIfNull("tree", src.getName(), src.getTree(), unlockObject, true);
+        addUnlockAndAlertIfNull("description", src.getName(), src.getDescription(), unlockObject, true);
+        addUnlockAndAlertIfNull("icon", src.getName(), src.getIcon(), unlockObject, true);
+        addUnlockAndAlertIfNull("tree", src.getName(), src.getTree(), unlockObject, true);
         if (src.getIconNbt() != null) {
-            addAndAlertIfNull("iconNbt", src.getName(), src.getIconNbt().toString(), unlockObject, false);
+            addUnlockAndAlertIfNull("iconNbt", src.getName(), src.getIconNbt().toString(), unlockObject, false);
         }
         return unlockObject;
     }
 
     public static void addDataToUnlock(Unlock<?> unlock, JsonObject unlockObject) {
+        getAndThrowIfNotValidRegistryObject(unlockObject.get("icon").getAsString(), "Unlock Icon " + unlock.getIcon() + " Is not a valid item! Unlock Name: " + unlockObject.get("name").getAsString(), ForgeRegistries.ITEMS);
         unlock.withIcon(getAndThrowIfNull(unlockObject.get("icon"), "Icon of unlock " + unlockObject.get("name") + " cannot be null!").getAsString());
         unlock.withTree(getAndThrowIfNull(unlockObject.get("tree"), "Tree of unlock " + unlockObject.get("name") + " cannot be null!").getAsString());
         unlock.withDescription(Component.literal(getAndThrowIfNull(unlockObject.get("description"), "Description of unlock " + unlockObject.get("name") + " cannot be null!").getAsString()));
         if (unlockObject.get("iconNbt") != null) {
             try {
                 unlock.withIconNbt(TagParser.parseTag(unlockObject.get("iconNbt").getAsString()));
-            } catch (CommandSyntaxException ignored) {}
+            } catch (CommandSyntaxException e) {
+                ModLockingMod.LOGGER.error("Icon Nbt " + unlockObject.getAsJsonPrimitive("iconNbt").getAsString() + " is invalid for tree " + unlockObject.get("name").getAsString());}
         }
     }
 }

@@ -8,4 +8,8 @@ public class KillEntityObtainMethod extends PointObtainMethod {
         super(amount, pointType);
         this.entityId = entity;
     }
+
+    public String getEntityId() {
+        return entityId;
+    }
 }

@@ -22,7 +22,8 @@ public class ModUnlockAdapter
 
     public ModUnlock deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject unlockObject = (JsonObject) json;
-        getAndThrowIfNull(unlockObject.get("name").getAsString(), "Name cannot be blank or null in config!");
+        JsonUtil.getAndThrowIfNull(unlockObject.get("name"), "Name of unlock cannot be null in config!");
+        JsonUtil.getAndThrowIfNull(unlockObject.get("name").getAsString(), "Name of unlock cannot be blank in config!");
         if (unlockObject.get("x") == null) {
             throw new JsonParseException("x value of Unlock " + unlockObject.get("name") + "cannot be null");
         }

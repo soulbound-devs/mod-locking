@@ -14,4 +14,8 @@ public class RightClickItemObtainMethod extends PointObtainMethod {
         super(amount, pointType);
         this.itemId = item;
     }
+
+    public String getItemId() {
+        return itemId;
+    }
 }
