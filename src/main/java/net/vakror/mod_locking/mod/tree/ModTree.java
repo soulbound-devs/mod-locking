@@ -97,9 +97,10 @@ public class ModTree implements INBTSerializable<CompoundTag> {
         backgroundTexture = nbt.getString("background");
         icon = nbt.getString("icon");
     }
+
     public <P> String restrictedBy(P item, Restriction.Type restrictionType) {
         StringBuilder sb = new StringBuilder();
-        for (Unlock unlock : ModConfigs.UNLOCKS.getAll()) {
+        for (Unlock<?> unlock : ModConfigs.UNLOCKS.getAll()) {
             if (modsUnlocked == null) modsUnlocked = new ArrayList<>();
             if (unlock.getTree().equals(name)) {
                 if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(item, restrictionType, true)) continue;

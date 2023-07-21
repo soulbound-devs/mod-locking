@@ -64,12 +64,12 @@ public class NbtUtil {
         return unlocks;
     }
 
-    public static Unlock deserializeUnlock(CompoundTag compound) {
+    public static Unlock<?> deserializeUnlock(CompoundTag compound) {
         return (compound.getString("type").equals("mod") ? deserializeModUnlock(compound.getString("name"), compound, deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), toArray(compound.getString("requiredUnlock"))):
                 deserializeFineGrainedUnlock(compound, compound.getString("name"), deserializePoints(compound), compound.getFloat("x"), compound.getFloat("y"), toArray(compound.getString("requiredUnlock")))).withDescription(Component.literal(compound.getString("description"))).withIcon(compound.getString("icon")).withIconNbt(compound.getCompound("iconNbt")).withTree(compound.getString("tree"));
     }
 
-    public static CompoundTag serializeUnlock(Unlock unlock) {
+    public static CompoundTag serializeUnlock(Unlock<?> unlock) {
         CompoundTag nbt = new CompoundTag();
 
         nbt.putString("name", unlock.getName());
@@ -91,22 +91,24 @@ public class NbtUtil {
     }
 
     private static void serializeFineGrainedUnlock(CompoundTag nbt, FineGrainedModUnlock unlock) {
+        CompoundTag compoundTag = new CompoundTag();
         CompoundTag tag = new CompoundTag();
         serializeRestriction(tag, unlock.getItemRestrictions(), "item");
-        nbt.put("item", tag);
+        compoundTag.put("item", tag);
         CompoundTag tag1 = new CompoundTag();
         serializeRestriction(tag1, unlock.getBlockRestrictions(), "block");
-        nbt.put("block", tag1);
+        compoundTag.put("block", tag1);
         CompoundTag tag2 = new CompoundTag();
         serializeRestriction(tag2, unlock.getEntityRestrictions(), "entity");
-        nbt.put("entity", tag2);
+        compoundTag.put("entity", tag2);
+        nbt.put("restrictions", compoundTag);
     }
 
-    private static Unlock deserializeFineGrainedUnlock(CompoundTag nbt, String name, Map<String, Integer> cost, float x, float y,String[] requiredUnlock) {
+    private static Unlock<FineGrainedModUnlock> deserializeFineGrainedUnlock(CompoundTag nbt, String name, Map<String, Integer> cost, float x, float y,String[] requiredUnlock) {
         FineGrainedModUnlock unlock = new FineGrainedModUnlock(name, cost, x, y,requiredUnlock);
-        unlock.setItemRestrictions(deserializeRestriction(nbt.getCompound("item"), "item"));
-        unlock.setBlockRestrictions(deserializeRestriction(nbt.getCompound("block"), "block"));
-        unlock.setEntityRestrictions(deserializeRestriction(nbt.getCompound("entity"), "entity"));
+        unlock.setItemRestrictions(deserializeRestriction(nbt.getCompound("restrictions").getCompound("item"), "item"));
+        unlock.setBlockRestrictions(deserializeRestriction(nbt.getCompound("restrictions").getCompound("block"), "block"));
+        unlock.setEntityRestrictions(deserializeRestriction(nbt.getCompound("restrictions").getCompound("entity"), "entity"));
         return unlock;
     }
 
@@ -119,10 +121,22 @@ public class NbtUtil {
 
     private static Map<String, Restriction> deserializeRestriction(CompoundTag nbt, String a) {
         Map<String, Restriction> map = new HashMap<>(nbt.getInt("size"));
-        for (int i = 0; i < nbt.getInt("size"); i++) {
-            map.put(nbt.getCompound(a).getString("name"), deserializeRestrictions(nbt, a));
-        };
+        nbt.getAllKeys().forEach((key -> {
+            if (!key.equals("size")) {
+                map.put(key, deserializeRestriction(nbt.getCompound(key)));
+            }
+        }));
         return map;
+    }
+
+    public static Restriction deserializeRestriction(CompoundTag nbt) {
+        Restriction restriction = new Restriction();
+        for (String key : nbt.getAllKeys()) {
+            if (!key.equals("size")) {
+                restriction.set(Restriction.Type.valueOf(key), nbt.getBoolean(key));
+            }
+        }
+        return restriction;
     }
 
     private static void serializeModUnlock(CompoundTag nbt, ModUnlock unlock) {
@@ -149,8 +163,7 @@ public class NbtUtil {
     private static void serializeRestrictions(CompoundTag nbt, Restriction restriction, String a, String name) {
         CompoundTag tag = new CompoundTag();
         restriction.getRestrictions().forEach((restrictionType, doesRestrict) -> tag.putBoolean(restrictionType.toString(), doesRestrict));
-        tag.putString("name", name);
-        nbt.put(a, tag);
+        nbt.put(name, tag);
     }
 
     private static Restriction deserializeRestrictions(CompoundTag nbt) {

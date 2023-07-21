@@ -141,12 +141,18 @@ public class JsonUtil {
         JsonObject restrictionObject = unlockObject.getAsJsonObject(name);
         Map<String, Restriction> map = new HashMap<>();
         for (String item : restrictionObject.keySet()) {
+            JsonObject itemObject = restrictionObject.getAsJsonObject(item);
             getAndThrowIfNotValidRegistryObject(item, "Unlock Restricted " + (name.equals("itemRestrictions") ? "Item": name.equals("blockRestrictions") ? "Block": "Entity") + " " + item + " Not Valid! Unlock Name: " + unlockObject.get("name").getAsString(), (name.equals("itemRestrictions") ? ForgeRegistries.ITEMS: name.equals("blockRestrictions") ? ForgeRegistries.BLOCKS: ForgeRegistries.ENTITY_TYPES) );
             for (Restriction.Type type : Restriction.Type.values()) {
-                if (restrictionObject.getAsJsonPrimitive(type.toString().toLowerCase()) != null) {
-                    JsonPrimitive shouldRestrict = restrictionObject.getAsJsonObject(item).getAsJsonPrimitive(type.toString().toLowerCase());
+                if (itemObject.getAsJsonPrimitive(type.toString().toLowerCase()) != null) {
+                    JsonPrimitive shouldRestrict = itemObject.getAsJsonPrimitive(type.toString().toLowerCase());
                     if (shouldRestrict != null) {
-                        map.put(item, new Restriction().set(type, shouldRestrict.getAsBoolean()));
+                        if (!map.containsKey(item)) {
+                            map.put(item, new Restriction().set(type, shouldRestrict.getAsBoolean()));
+                        } else {
+                            map.put(item, map.get(item).set(type, shouldRestrict.getAsBoolean()));
+                        }
+                        int c = 0;
                     }
                 }
             }
