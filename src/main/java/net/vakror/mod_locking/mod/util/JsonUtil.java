@@ -130,7 +130,7 @@ public class JsonUtil {
     }
 
     public static ResourceLocation getAndThrowIfNotResourceLocation(String string, String message) {
-        if (!string.contains(":") || (string.replaceAll("[^_:/a-zA-Z0-9]", "").length() != string.length())) {
+        if (!string.contains(":") || (string.replaceAll("[^._:/a-zA-Z0-9]", "").length() != string.length())) {
             throw new JsonParseException(message);
         } else {
             return new ResourceLocation(string);
