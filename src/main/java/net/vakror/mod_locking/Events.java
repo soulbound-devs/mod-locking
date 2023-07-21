@@ -208,7 +208,7 @@ public class Events {
         }
         List<ModTree> unlockTrees = ModTrees.getUnlockTrees(player);
         unlockTrees.forEach((unlockTree -> {
-            String restrictedBy = unlockTree.restrictedBy((event.getEntity()).getType(), Restriction.Type.ENTITY_INTERACTABILITY);
+            String restrictedBy = unlockTree.restrictedBy((event.getEntity()).getType(), Restriction.Type.HITTABILITY);
             if (restrictedBy != null) {
                 if (player.level().isClientSide) {
                     warnPlayerNeedsUnlock(restrictedBy, "hit_entity");
