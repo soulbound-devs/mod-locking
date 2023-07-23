@@ -1,10 +1,7 @@
 package net.vakror.mod_locking.mod.config;
 
 
-import net.vakror.mod_locking.mod.config.configs.ModPointObtainConfig;
-import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
-import net.vakror.mod_locking.mod.config.configs.ModTreesConfig;
-import net.vakror.mod_locking.mod.config.configs.ModUnlocksConfig;
+import net.vakror.mod_locking.mod.config.configs.*;
 
 public class ModConfigs {
     public static ModUnlocksConfig UNLOCKS;
