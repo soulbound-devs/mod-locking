@@ -24,11 +24,6 @@ public class ModLockingJeiPlugin implements IModPlugin {
     }
 
     @Override
-    public void registerRuntime(IRuntimeRegistration registration) {
-        System.out.println("ihhfregeoifhergyehygeg");
-    }
-
-    @Override
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
         IModPlugin.super.onRuntimeAvailable(jeiRuntime);
     }
