@@ -1,13 +1,17 @@
 package net.vakror.mod_locking.mod.point.obtain;
 
-import net.minecraft.resources.ResourceLocation;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.ForgeRegistries;
-
-import java.util.Objects;
+import net.vakror.mod_locking.mod.util.CodecUtils;
 
 public class RightClickItemObtainMethod extends PointObtainMethod {
 
+    public static Codec<RightClickItemObtainMethod> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.fieldOf("pointType").forGetter(RightClickItemObtainMethod::getPointType),
+            Codec.STRING.fieldOf("item").forGetter(RightClickItemObtainMethod::getItem),
+            Codec.INT.fieldOf("amount").forGetter(RightClickItemObtainMethod::getAmount)
+    ).apply(instance, RightClickItemObtainMethod::new));
     public String itemId;
 
     public RightClickItemObtainMethod(String item, int amount, String pointType) {
@@ -15,7 +19,12 @@ public class RightClickItemObtainMethod extends PointObtainMethod {
         this.itemId = item;
     }
 
-    public String getItemId() {
+    public RightClickItemObtainMethod(String pointType, String item, int amount) {
+        super(amount, pointType);
+        this.itemId = item;
+    }
+
+    public String getItem() {
         return itemId;
     }
 }

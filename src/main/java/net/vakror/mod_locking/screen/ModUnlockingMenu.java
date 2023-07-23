@@ -1,18 +1,15 @@
 package net.vakror.mod_locking.screen;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.Unlock;
-import net.vakror.mod_locking.mod.util.NbtUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;

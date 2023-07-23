@@ -3,20 +3,22 @@ package net.vakror.mod_locking.mod.unlock;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.vakror.mod_locking.Tooltip;
 import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
 import net.vakror.mod_locking.mod.tree.ModTree;
-import net.vakror.mod_locking.mod.util.NbtUtil;
 import net.vakror.mod_locking.screen.ModUnlockingScreen;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Unlock<T extends Unlock> {
@@ -29,7 +31,7 @@ public class Unlock<T extends Unlock> {
     protected float y;
     protected String description = "sample description";
     protected String icon;
-    protected String tree;
+    protected String treeName;
 
     protected CompoundTag iconNbt;
 
@@ -76,13 +78,13 @@ public class Unlock<T extends Unlock> {
     }
 
     public T withTree(ModTree tree) {
-        this.tree = tree.name;
+        this.treeName = tree.name;
         return (T) this;
     }
 
 
     public T withTree(String tree) {
-        this.tree = tree;
+        this.treeName = tree;
         return (T) this;
     }
 
@@ -91,8 +93,8 @@ public class Unlock<T extends Unlock> {
         return (T) this;
     }
 
-    public String getTree() {
-        return tree;
+    public String getTreeName() {
+        return treeName;
     }
 
     public List<Unlock<?>> getParents() {
@@ -123,8 +125,26 @@ public class Unlock<T extends Unlock> {
         return iconNbt;
     }
 
+    public Optional<CompoundTag> getOptionalIconNbt() {
+        if (iconNbt == null) {
+            return Optional.empty();
+        }
+        return Optional.of(iconNbt);
+    }
+
     public String[] getRequiredUnlocks() {
         return requiredUnlocks;
+    }
+
+    public List<String> getRequiredUnlocksAsList() {
+        return new ArrayList<>(List.of(requiredUnlocks));
+    }
+
+    public Optional<List<String>> getOptionalRequiredUnlocksAsList() {
+        if (requiredUnlocks == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new ArrayList<>(List.of(requiredUnlocks)));
     }
 
     public float getX() {
@@ -147,7 +167,7 @@ public class Unlock<T extends Unlock> {
         list.add(new Tooltip.TooltipComponentBuilder().addPart("Cost: ").setStyle(Style.EMPTY.withBold(true)).build().getTooltip());
 
         getCost().forEach((name, amount) -> {
-            list.add(Component.literal(amount + " " + (amount > 1 ? NbtUtil.getPoint(name).pluralName: name)).setStyle(Style.EMPTY.withColor(screen.getMenu().getPointColors().get(name))));
+            list.add(Component.literal(amount + " " + (amount > 1 ? ModPointsConfig.getPoint(name).pluralName: name)).setStyle(Style.EMPTY.withColor(screen.getMenu().getPointColors().get(name))));
         });
 
         AtomicBoolean canAfford = new AtomicBoolean(true);

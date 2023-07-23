@@ -134,11 +134,13 @@ public class ModTreeTab {
             }
         }
 
-        rootUnlocks.forEach((root -> {
-            root.drawConnectivity(graphics, i, j, true);
-            root.drawConnectivity(graphics, i, j, false);
-            root.draw(graphics, i, j);
+        widgets.values().forEach((widget -> {
+            widget.drawConnectivity(graphics, i, j, true);
+            widget.drawConnectivity(graphics, i, j, false);
         }));
+        for (ModWidget widget : widgets.values()) {
+            widget.draw(graphics, i, j);
+        }
         graphics.pose().popPose();
         graphics.disableScissor();
     }
@@ -197,8 +199,10 @@ public class ModTreeTab {
     }
 
     public void addUnlock(Unlock<?> unlock) {
-        ModWidget modWidget = new ModWidget(this, this.minecraft, unlock);
-        this.addWidget(modWidget, unlock);
+        if (!widgets.containsKey(unlock)) {
+            ModWidget modWidget = new ModWidget(this, this.minecraft, unlock);
+            this.addWidget(modWidget, unlock);
+        }
     }
 
     private void addWidget(ModWidget modWidget, Unlock<?> unlock) {
@@ -218,13 +222,14 @@ public class ModTreeTab {
     }
 
     @Nullable
-    public ModWidget getWidget(Unlock unlock) {
-        for (ModWidget widget: this.widgets.values()) {
+    public ModWidget getWidget(Unlock<?> unlock) {
+        for (ModWidget widget : this.widgets.values()) {
             if (unlock.getName().equals(widget.getUnlock().getName())) {
                 return widget;
             }
         }
-        return null;
+        this.screen.exceptionMessage = ("Cannot find widget of name " + unlock.getName() + " In tree " + tree.name + "! Declare child unlock AFTER all parents!");
+        return new ModWidget(this, Minecraft.getInstance(), unlock);
     }
 
     public ModUnlockingScreen getScreen() {

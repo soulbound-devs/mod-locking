@@ -35,7 +35,7 @@ public class RequestAllDataC2SPacket {
             ModConfigs.POINTS.points.forEach((point -> {
                 pointPluralNames.put(point.name, point.pluralName);
             }));
-            ModPackets.sendToClient(new SyncAllDataS2CPacket(points, pointPluralNames, pointColors, ModConfigs.UNLOCKS.getAll(), ModConfigs.TREES.trees, false), context.getSender());
+            ModPackets.sendToClient(new SyncAllDataS2CPacket(ModConfigs.POINTS.points, ModConfigs.UNLOCKS.getAll(), ModConfigs.TREES.trees, false), context.getSender());
         });
         return true;
     }

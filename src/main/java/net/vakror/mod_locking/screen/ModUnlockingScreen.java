@@ -55,6 +55,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     private ModTreeTab selectedTab;
     private boolean isScrolling;
     private static int tabPage, maxPages;
+    public String exceptionMessage;
 
     public ModUnlockingScreen(ModUnlockingMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -117,18 +118,21 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
 
     @Override
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        assert selectedTab != null;
-        int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
-        int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
-        this.renderBackground(graphics);
-        if (maxPages != 0) {
-            net.minecraft.network.chat.Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
-            int width = this.font.width(page);
-            graphics.drawString(this.font, page.getVisualOrderText(), i + ((width - selectedTab.getMarginX() * 2) / 2) - (width / 2), j - 44, -1);
+        try {
+            int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
+            int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
+            this.renderBackground(graphics);
+            if (maxPages != 0) {
+                net.minecraft.network.chat.Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
+                int width = this.font.width(page);
+                graphics.drawString(this.font, page.getVisualOrderText(), i + ((width - selectedTab.getMarginX() * 2) / 2) - (width / 2), j - 44, -1);
+            }
+            this.renderInside(graphics, pMouseX, pMouseY, i, j);
+            this.renderWindow(graphics, i, j);
+            this.renderTooltips(graphics, pMouseX, pMouseY, i, j);
+        } catch (NullPointerException e) {
+            throw new NullPointerException(exceptionMessage);
         }
-        this.renderInside(graphics, pMouseX, pMouseY, i, j);
-        this.renderWindow(graphics, i, j);
-        this.renderTooltips(graphics, pMouseX, pMouseY, i, j);
     }
 
     @Override
@@ -248,7 +252,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         for (int i = 0; i < this.menu.trees.size(); i++) {
             List<Unlock<?>> unlocks = new ArrayList<>(unlock.size());
             for (Unlock<?> unlock1: unlock) {
-                if (unlock1.getTree().equals(this.menu.trees.get(i).name)) {
+                if (unlock1.getTreeName().equals(this.menu.trees.get(i).name)) {
                     unlocks.add(unlock1);
                 }
             }
@@ -272,7 +276,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         this.tabs.put(root, treeTab);
     }
 
-    public void onAddNonRootUnlock(Unlock unlock) {
+    public void onAddNonRootUnlock(Unlock<?> unlock) {
         ModTreeTab tab = this.getTab(unlock);
         if (tab != null) {
             tab.addUnlock(unlock);
@@ -280,7 +284,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     }
 
     @Nullable
-    public ModWidget getUnlockWidget(Unlock unlock) {
+    public ModWidget getUnlockWidget(Unlock<?> unlock) {
         ModTreeTab tab = this.getTab(unlock);
         return tab == null ? null : tab.getWidget(unlock);
     }

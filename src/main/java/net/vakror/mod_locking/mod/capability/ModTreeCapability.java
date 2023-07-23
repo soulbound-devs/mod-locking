@@ -1,12 +1,14 @@
 package net.vakror.mod_locking.mod.capability;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
+import net.vakror.mod_locking.mod.point.ModPoint;
 import net.vakror.mod_locking.mod.tree.ModTree;
-import net.vakror.mod_locking.mod.util.NbtUtil;
 import net.vakror.mod_locking.packet.ModPackets;
 import net.vakror.mod_locking.packet.SyncPointsS2CPacket;
 
@@ -17,13 +19,19 @@ public class ModTreeCapability {
 
     Map<String, Integer> points = new HashMap<>();
     public void saveNBTData(CompoundTag nbt) {
-        NbtUtil.serializePoints(nbt, points);
-        NbtUtil.serializeTrees(nbt, trees);
+        CompoundTag treeTag = new CompoundTag();
+        for (ModTree tree: trees) {
+            treeTag.put("tree_" + tree.name, ModTree.CODEC_WITH_MODS_UNLOCKED.encodeStart(NbtOps.INSTANCE, tree).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
+        }
+        nbt.put("points", ModPoint.MAP_CODEC.encodeStart(NbtOps.INSTANCE, points).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
+        nbt.put("trees", treeTag);
     }
 
     public ModTreeCapability loadNBTData(CompoundTag nbt) {
-        trees = NbtUtil.deserializeTrees(nbt);
-        points = NbtUtil.deserializePoints(nbt);
+        CompoundTag treeTag = nbt.getCompound("trees");
+        CompoundTag pointTag = nbt.getCompound("points");
+        treeTag.getAllKeys().forEach((key) -> trees.add(ModTree.CODEC_WITH_MODS_UNLOCKED.parse(NbtOps.INSTANCE, treeTag.getCompound(key)).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get()));
+        points = ModPoint.MAP_CODEC.parse(NbtOps.INSTANCE, pointTag).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get();
 
         return this;
     }
@@ -45,7 +53,7 @@ public class ModTreeCapability {
     public Map<String, Integer> getPointColors() {
         Map<String, Integer> colors = new HashMap<>(points.size());
         points.forEach((name, amount) -> {
-            colors.put(name, NbtUtil.getPoint(name).getColor());
+            colors.put(name, ModPointsConfig.getPoint(name).getColor());
         });
         return colors;
     }
@@ -53,7 +61,7 @@ public class ModTreeCapability {
     public Map<String, String> getPointPluralNames() {
         Map<String, String> colors = new HashMap<>(points.size());
         points.forEach((name, amount) -> {
-            colors.put(name, NbtUtil.getPoint(name).pluralName);
+            colors.put(name, ModPointsConfig.getPoint(name).pluralName);
         });
         return colors;
     }
@@ -65,14 +73,14 @@ public class ModTreeCapability {
     public void setPoints(Map<String, Integer> points, Player player) {
         this.points = points;
         if (Thread.currentThread().getThreadGroup().equals(SidedThreadGroups.SERVER)) {
-            ModPackets.sendToClient(new SyncPointsS2CPacket(getPoints(), getPointPluralNames(), getPointColors()), (ServerPlayer) player);
+            ModPackets.sendToClient(new SyncPointsS2CPacket(ModConfigs.POINTS.points), (ServerPlayer) player);
         }
     }
 
     public void addPoint(String point, int amount, Player player) {
         this.points.put(point, this.points.get(point) + amount);
         if (Thread.currentThread().getThreadGroup().equals(SidedThreadGroups.SERVER)) {
-            ModPackets.sendToClient(new SyncPointsS2CPacket(getPoints(), getPointPluralNames(), getPointColors()), (ServerPlayer) player);
+            ModPackets.sendToClient(new SyncPointsS2CPacket(ModConfigs.POINTS.points), (ServerPlayer) player);
         }
     }
 }

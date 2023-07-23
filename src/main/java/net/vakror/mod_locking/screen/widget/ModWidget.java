@@ -81,7 +81,12 @@ public class ModWidget {
         if (unlock.getParents() != null) {
             for (Unlock<?> parent: unlock.getParents()) {
                 if (parent != null) {
-                    parents.add(this.tab.getWidget(parent));
+                    if (this.tab.getWidget(parent) != null) {
+                        parents.add(this.tab.getWidget(parent));
+                    } else {
+                        this.tab.addUnlock(parent);
+                        parents.add(this.tab.getWidget(parent));
+                    }
                 }
             }
         }
@@ -114,9 +119,6 @@ public class ModWidget {
                 }
             }
         }
-        for (ModWidget widget : this.children) {
-            widget.drawConnectivity(graphics, x, y, shadow);
-        }
     }
 
     public void draw(GuiGraphics graphics, int x, int y) {
@@ -129,10 +131,6 @@ public class ModWidget {
             fakeUnlockStack.setTag(tag);
         }
         graphics.renderFakeItem(fakeUnlockStack, x + this.x + 8, y + this.y + 5);
-
-        for (ModWidget widget : this.children) {
-            widget.draw(graphics, x, y);
-        }
     }
 
     public int getWidth() {
@@ -143,10 +141,10 @@ public class ModWidget {
         this.isDone = progress;
     }
 
-    public void addChild(ModWidget p_97307_) {
-        this.children.add(p_97307_);
+    public void addChild(ModWidget child) {
+        this.children.add(child);
     }
-    public Unlock getUnlock() {
+    public Unlock<?> getUnlock() {
         return unlock;
     }
 
