@@ -8,9 +8,6 @@ import java.util.Optional;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -25,7 +22,7 @@ import static net.vakror.mod_locking.mod.util.CodecUtils.*;
 public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
     public static final Codec<FineGrainedModUnlock> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(FineGrainedModUnlock::getName),
-            COST_CODEC.fieldOf("cost").forGetter(FineGrainedModUnlock::getCost),
+            POINT_MAP_CODEC.fieldOf("cost").forGetter(FineGrainedModUnlock::getCost),
             Codec.STRING.listOf().optionalFieldOf("requiredUnlocks").forGetter((FineGrainedModUnlock::getOptionalRequiredUnlocksAsList)),
             Codec.FLOAT.fieldOf("x").forGetter(FineGrainedModUnlock::getX),
             Codec.FLOAT.fieldOf("y").forGetter(FineGrainedModUnlock::getY),

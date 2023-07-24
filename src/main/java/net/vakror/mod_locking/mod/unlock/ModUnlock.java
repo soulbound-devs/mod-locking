@@ -23,7 +23,7 @@ import static net.vakror.mod_locking.mod.util.CodecUtils.*;
 public class ModUnlock extends Unlock<ModUnlock> {
     public static final Codec<ModUnlock> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(ModUnlock::getName),
-            COST_CODEC.fieldOf("cost").forGetter(ModUnlock::getCost),
+            POINT_MAP_CODEC.fieldOf("cost").forGetter(ModUnlock::getCost),
             Codec.STRING.listOf().optionalFieldOf("requiredUnlocks").forGetter((ModUnlock::getOptionalRequiredUnlocksAsList)),
             RESTRICTION_CODEC.fieldOf("restrictions").forGetter(ModUnlock::getRestriction),
             Codec.FLOAT.fieldOf("x").forGetter(ModUnlock::getX),
