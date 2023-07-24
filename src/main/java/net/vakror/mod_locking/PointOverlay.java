@@ -25,7 +25,7 @@ public class PointOverlay {
                     int amount = Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints().get(point.name);
                     String nameString = amount + " " + (amount > 1 ? point.pluralName : point.name);
                     int nameWidth = Minecraft.getInstance().font.width(nameString);
-                    graphics.drawString(Minecraft.getInstance().font, nameString, width - nameWidth, y - (10 * i), point.getColor(), false);
+                    graphics.drawString(Minecraft.getInstance().font, nameString, width - nameWidth - 10, (12 * i) - 6, point.getColor(), false);
                     i++;
                 }
             }
