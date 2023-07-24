@@ -36,16 +36,21 @@ public abstract class ItemMixin {
     @Shadow
     public abstract Item asItem();
 
-    @Inject(method = "use", at = @At("HEAD"))
+    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void addPointsOnUse(Level level, Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
         if (!level.isClientSide) {
-            ModConfigs.POINT_OBTAIN_METHODS.useItemObtainMethods.forEach((obtainMethod -> {
-                if ((Objects.equals(obtainMethod.getItem(), this.asItem()))) {
-                    player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
-                        modTreeCapability.addPoint(obtainMethod.getPointType(), obtainMethod.getAmount() == 0 ? 1 : obtainMethod.getAmount(), player);
-                    }));
+            for (RightClickItemObtainMethod useItemObtainMethod : ModConfigs.POINT_OBTAIN_METHODS.useItemObtainMethods) {
+                if (useItemObtainMethod.itemId.equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(player.getItemInHand(hand).getItem())).toString())) {
+                    if (player.getItemInHand(hand).getCount() > 0) {
+                        player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
+                            modTreeCapability.addPoint(useItemObtainMethod.getPointType(), useItemObtainMethod.getAmount(), (ServerPlayer) player);
+                            ItemStack newStack = player.getItemInHand(hand);
+                            newStack.shrink(1);
+                            cir.setReturnValue(InteractionResultHolder.consume(newStack));
+                        }));
+                    }
                 }
-            }));
+            }
         }
     }
 }

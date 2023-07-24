@@ -8,6 +8,7 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,40 +32,40 @@ import net.minecraftforge.server.command.ConfigCommand;
 import net.vakror.mod_locking.command.ReloadModLocksCommand;
 import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.point.obtain.RightClickItemObtainMethod;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.tree.ModTrees;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.packet.ModPackets;
 import net.vakror.mod_locking.packet.RequestAllDataC2SPacket;
+import net.vakror.mod_locking.packet.RequestPlayerPointsC2SPacket;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class Events {
-    @Mod.EventBusSubscriber(modid = ModLockingMod.MOD_ID)
-    public static class ForgeEvents {
-        @SubscribeEvent
-        public static void registerCapabilitiesEvent(RegisterCapabilitiesEvent event) {
-            event.register(ModTreeCapability.class);
-        }
-        @SubscribeEvent
-        public static void attachTreeCapabilityEvent(AttachCapabilitiesEvent<Player> event) {
-            event.addCapability(new ResourceLocation(ModLockingMod.MOD_ID, "modTree"), new ModTreeProvider());
-        }
+    public static void registerCapabilitiesEvent(RegisterCapabilitiesEvent event) {
+        event.register(ModTreeCapability.class);
+    }
 
-        @SubscribeEvent
-        public static void onItemUse(PlayerInteractEvent.RightClickItem event) {
-            if (!event.isCancelable()) {
-                return;
-            }
-            Player player = event.getEntity();
-            if (player.isCreative()) {
-                return;
-            }
-            List<ModTree> unlockTrees = ModTrees.getUnlockTrees(player);
-            unlockTrees.forEach((unlockTree -> {
+    public static void attachTreeCapabilityEvent(AttachCapabilitiesEvent<Entity> event) {
+        if (event.getObject() instanceof Player) {
+            event.addCapability(new ResourceLocation(ModLockingMod.MOD_ID, "mod-tree"), new ModTreeProvider());
+        }
+    }
+
+    public static void onItemUse(PlayerInteractEvent.RightClickItem event) {
+        if (!event.isCancelable()) {
+            return;
+        }
+        Player player = event.getEntity();
+        if (player.isCreative()) {
+            return;
+        }
+        List<ModTree> unlockTrees = ModTrees.getUnlockTrees(player);
+        unlockTrees.forEach((unlockTree -> {
             String restrictedBy = unlockTree.restrictedBy(event.getItemStack().getItem(), Restriction.Type.USABILITY);
             if (restrictedBy == null) {
                 return;
@@ -74,11 +75,11 @@ public class Events {
             }
             event.setCanceled(true);
         }));
-        }
     }
 
     public static void onPlayerLogIn(ClientPlayerNetworkEvent.LoggingIn event) {
         ModPackets.sendToServer(new RequestAllDataC2SPacket());
+        ModPackets.sendToServer(new RequestPlayerPointsC2SPacket());
     }
 
     public static void onBlockInteraction(PlayerInteractEvent.RightClickBlock event) {
@@ -185,17 +186,13 @@ public class Events {
     }
 
     public static void onEntityDeath(LivingDeathEvent event) {
-        if (!event.getEntity().level().isClientSide) {
-            ModConfigs.POINT_OBTAIN_METHODS.killEntityObtainMethods.forEach((killEntityObtainMethod -> {
-                if (event.getEntity().getType().equals(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(killEntityObtainMethod.entityId)))) {
-                    if (event.getSource().getEntity() instanceof ServerPlayer player) {
-                        player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
-                            modTreeCapability.addPoint(killEntityObtainMethod.getPointType(), killEntityObtainMethod.getAmount(), player);
-                        }));
-                    }
+        ModConfigs.POINT_OBTAIN_METHODS.killEntityObtainMethods.forEach((killEntityObtainMethod -> {
+            if (event.getEntity().getType().equals(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(killEntityObtainMethod.entityId)))) {
+                if (event.getSource().getEntity() instanceof Player player) {
+                    player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> modTreeCapability.addPoint(killEntityObtainMethod.getPointType(), killEntityObtainMethod.getAmount(), (ServerPlayer) player)));
                 }
-            }));
-        }
+            }
+        }));
     }
 
     public static void onPlayerAttack(AttackEntityEvent event) {

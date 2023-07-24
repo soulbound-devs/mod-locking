@@ -7,6 +7,7 @@ import net.vakror.mod_locking.mod.util.CodecUtils;
 public class KillEntityObtainMethod extends PointObtainMethod {
     public static Codec<KillEntityObtainMethod> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("pointType").forGetter(KillEntityObtainMethod::getPointType),
+            Codec.STRING.fieldOf("type").forGetter((obtainMethod) -> getType()),
             Codec.STRING.fieldOf("entity").forGetter(KillEntityObtainMethod::getEntityId),
             Codec.INT.fieldOf("amount").forGetter(KillEntityObtainMethod::getAmount)
     ).apply(instance, KillEntityObtainMethod::new));
@@ -17,12 +18,16 @@ public class KillEntityObtainMethod extends PointObtainMethod {
         this.entityId = entity;
     }
 
-    public KillEntityObtainMethod(String pointType, String entity, int amount) {
+    public KillEntityObtainMethod(String pointType, String type, String entity, int amount) {
         super(amount, pointType);
         this.entityId = entity;
     }
 
     public String getEntityId() {
         return entityId;
+    }
+
+    public static String getType() {
+        return "killEntity";
     }
 }

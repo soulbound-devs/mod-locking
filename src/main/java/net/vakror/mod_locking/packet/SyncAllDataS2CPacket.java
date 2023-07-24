@@ -10,6 +10,9 @@ import net.minecraftforge.network.NetworkEvent;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.point.ModPoint;
+import net.vakror.mod_locking.mod.point.obtain.KillEntityObtainMethod;
+import net.vakror.mod_locking.mod.point.obtain.PointObtainMethod;
+import net.vakror.mod_locking.mod.point.obtain.RightClickItemObtainMethod;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.ModUnlock;
@@ -25,13 +28,15 @@ import java.util.function.Supplier;
 public class SyncAllDataS2CPacket {
     private final List<ModPoint> points;
     private final List<Unlock<?>> unlocks;
+    private final List<PointObtainMethod> pointObtainMethods;
     private final List<ModTree> trees;
     private final boolean reloaded;
 
-    public SyncAllDataS2CPacket(List<ModPoint> points, List<Unlock<?>> unlocks, List<ModTree> trees, boolean reloaded) {
+    public SyncAllDataS2CPacket(List<ModPoint> points, List<Unlock<?>> unlocks, List<ModTree> trees, List<PointObtainMethod> pointObtainMethods, boolean reloaded) {
         this.points = points;
         this.unlocks = unlocks;
         this.trees = trees;
+        this.pointObtainMethods = pointObtainMethods;
         this.reloaded = reloaded;
     }
 
@@ -56,6 +61,15 @@ public class SyncAllDataS2CPacket {
                 unlocks.add(FineGrainedModUnlock.CODEC.parse(NbtOps.INSTANCE, unlockTag.getCompound(key)).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
             }
         }
+        CompoundTag obtainMethodTag = nbt.getCompound("obtainMethods");
+        pointObtainMethods = new ArrayList<>();
+        for (String key: obtainMethodTag.getAllKeys()) {
+            if (obtainMethodTag.getCompound(key).getString("type").equals("useItem")) {
+                pointObtainMethods.add(RightClickItemObtainMethod.CODEC.parse(NbtOps.INSTANCE, obtainMethodTag.getCompound(key)).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
+            } else if (obtainMethodTag.getCompound(key).getString("type").equals("killEntity")) {
+                pointObtainMethods.add(KillEntityObtainMethod.CODEC.parse(NbtOps.INSTANCE, obtainMethodTag.getCompound(key)).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
+            }
+        }
         reloaded = buf.readBoolean();
     }
 
@@ -65,6 +79,7 @@ public class SyncAllDataS2CPacket {
         CompoundTag pointTag = new CompoundTag();
         CompoundTag treeTag = new CompoundTag();
         CompoundTag unlockTag = new CompoundTag();
+        CompoundTag obtainTag = new CompoundTag();
 
         for (ModPoint point : points) {
             pointTag.put(point.name, ModPoint.CODEC.encodeStart(NbtOps.INSTANCE, point).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
@@ -85,17 +100,21 @@ public class SyncAllDataS2CPacket {
             }
         }
 
+        int i = 0;
+        for (PointObtainMethod method: pointObtainMethods) {
+            if (method instanceof KillEntityObtainMethod killEntityObtainMethod) {
+                obtainTag.put("killEntityMethod" + i, KillEntityObtainMethod.CODEC.encodeStart(NbtOps.INSTANCE, killEntityObtainMethod).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
+            } else if (method instanceof RightClickItemObtainMethod rightClickItemObtainMethod){
+                obtainTag.put("useItemMethod" + i, RightClickItemObtainMethod.CODEC.encodeStart(NbtOps.INSTANCE, rightClickItemObtainMethod).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
+            }
+            i++;
+        }
+
         nbt.put("points", pointTag);
         nbt.put("trees", treeTag);
         nbt.put("unlocks", unlockTag);
+        nbt.put("obtainMethods", obtainTag);
         tag.put("data", nbt);
-        try {
-            FileOutputStream fileoutputstream = new FileOutputStream(FMLPaths.CONFIGDIR.get().resolve("mod-locking/b.nbt").toFile());
-            DataOutputStream dataoutputstream = new DataOutputStream(fileoutputstream);
-            tag.write(dataoutputstream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         buf.writeNbt(tag);
         buf.writeBoolean(reloaded);
     }
@@ -110,6 +129,16 @@ public class SyncAllDataS2CPacket {
             ModConfigs.UNLOCKS.modUnlocks = new ArrayList<>();
             ModConfigs.UNLOCKS.fineGrainedUnlocks = new ArrayList<>();
             ModConfigs.TREES.trees = trees;
+            ModConfigs.POINT_OBTAIN_METHODS.killEntityObtainMethods.clear();
+            ModConfigs.POINT_OBTAIN_METHODS.useItemObtainMethods.clear();
+            for (PointObtainMethod pointObtainMethod : pointObtainMethods) {
+                if (pointObtainMethod instanceof KillEntityObtainMethod) {
+                    ModConfigs.POINT_OBTAIN_METHODS.killEntityObtainMethods.add((KillEntityObtainMethod) pointObtainMethod);
+                }
+                if (pointObtainMethod instanceof RightClickItemObtainMethod) {
+                    ModConfigs.POINT_OBTAIN_METHODS.useItemObtainMethods.add((RightClickItemObtainMethod) pointObtainMethod);
+                }
+            }
             this.unlocks.forEach((unlock -> {
                 if (unlock instanceof FineGrainedModUnlock fineGrainedModUnlock) {
                     ModConfigs.UNLOCKS.fineGrainedUnlocks.add(fineGrainedModUnlock);

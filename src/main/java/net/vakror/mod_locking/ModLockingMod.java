@@ -1,6 +1,8 @@
 package net.vakror.mod_locking;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -36,6 +38,9 @@ public class ModLockingMod {
         MinecraftForge.EVENT_BUS.addListener(Events::onBlockHit);
         MinecraftForge.EVENT_BUS.addListener(Events::onEntityInteraction);
         MinecraftForge.EVENT_BUS.addListener(Events::onBlockInteraction);
+        MinecraftForge.EVENT_BUS.addListener(Events::onItemUse);
+        MinecraftForge.EVENT_BUS.addListener(Events::registerCapabilitiesEvent);
+        MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, Events::attachTreeCapabilityEvent);
         MinecraftForge.EVENT_BUS.addListener(Events::onPlayerAttack);
         MinecraftForge.EVENT_BUS.addListener(Events::onEntityDeath);
         MinecraftForge.EVENT_BUS.addListener(Events::onCommandsRegister);

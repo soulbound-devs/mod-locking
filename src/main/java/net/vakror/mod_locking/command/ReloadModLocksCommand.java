@@ -32,7 +32,7 @@ public class ReloadModLocksCommand {
             ModConfigs.POINTS.points.forEach((point -> {
                 pointPluralNames.put(point.name, point.pluralName);
             }));
-            ModPackets.sendToClients(new SyncAllDataS2CPacket(ModConfigs.POINTS.points, ModConfigs.UNLOCKS.getAll(), ModConfigs.TREES.trees, true));
+            ModPackets.sendToClients(new SyncAllDataS2CPacket(ModConfigs.POINTS.points, ModConfigs.UNLOCKS.getAll(), ModConfigs.TREES.trees, ModConfigs.POINT_OBTAIN_METHODS.getAll(), true));
         } catch (Exception e) {
             e.printStackTrace();
         }

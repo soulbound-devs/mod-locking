@@ -32,24 +32,6 @@ public class ModPackets {
                 .consumerNetworkThread(OpenLockingScreenC2SPacket::handle)
                 .add();
 
-        net.messageBuilder(RequestTreeUpdateC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(RequestTreeUpdateC2SPacket::new)
-                .encoder(RequestTreeUpdateC2SPacket::encode)
-                .consumerNetworkThread(RequestTreeUpdateC2SPacket::handle)
-                .add();
-
-        net.messageBuilder(SyncPointsS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(SyncPointsS2CPacket::new)
-                .encoder(SyncPointsS2CPacket::encode)
-                .consumerNetworkThread(SyncPointsS2CPacket::handle)
-                .add();
-
-        net.messageBuilder(SyncModTreesS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(SyncModTreesS2CPacket::new)
-                .encoder(SyncModTreesS2CPacket::encode)
-                .consumerNetworkThread(SyncModTreesS2CPacket::handle)
-                .add();
-
         net.messageBuilder(SyncAllDataS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncAllDataS2CPacket::new)
                 .encoder(SyncAllDataS2CPacket::encode)
@@ -60,6 +42,18 @@ public class ModPackets {
                 .decoder(RequestAllDataC2SPacket::new)
                 .encoder(RequestAllDataC2SPacket::encode)
                 .consumerNetworkThread(RequestAllDataC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(SyncPlayerPointsS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncPlayerPointsS2CPacket::new)
+                .encoder(SyncPlayerPointsS2CPacket::encode)
+                .consumerNetworkThread(SyncPlayerPointsS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(RequestPlayerPointsC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(RequestPlayerPointsC2SPacket::new)
+                .encoder(RequestPlayerPointsC2SPacket::encode)
+                .consumerNetworkThread(RequestPlayerPointsC2SPacket::handle)
                 .add();
     }
 

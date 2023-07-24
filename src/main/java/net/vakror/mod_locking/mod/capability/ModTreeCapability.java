@@ -3,19 +3,19 @@ package net.vakror.mod_locking.mod.capability;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
 import net.vakror.mod_locking.mod.point.ModPoint;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.packet.ModPackets;
-import net.vakror.mod_locking.packet.SyncPointsS2CPacket;
+import net.vakror.mod_locking.packet.RequestPlayerPointsC2SPacket;
+import net.vakror.mod_locking.packet.SyncPlayerPointsS2CPacket;
 
 import java.util.*;
 
 public class ModTreeCapability {
-    List<ModTree> trees;
+    List<ModTree> trees = new ArrayList<>();
 
     Map<String, Integer> points = new HashMap<>();
     public void saveNBTData(CompoundTag nbt) {
@@ -31,7 +31,7 @@ public class ModTreeCapability {
         CompoundTag treeTag = nbt.getCompound("trees");
         CompoundTag pointTag = nbt.getCompound("points");
         treeTag.getAllKeys().forEach((key) -> trees.add(ModTree.CODEC_WITH_MODS_UNLOCKED.parse(NbtOps.INSTANCE, treeTag.getCompound(key)).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get()));
-        points = ModPoint.MAP_CODEC.parse(NbtOps.INSTANCE, pointTag).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get();
+        points = new HashMap<>(ModPoint.MAP_CODEC.parse(NbtOps.INSTANCE, pointTag).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
 
         return this;
     }
@@ -70,17 +70,27 @@ public class ModTreeCapability {
         this.trees = trees;
     }
 
-    public void setPoints(Map<String, Integer> points, Player player) {
+    public void setPoints(Map<String, Integer> points) {
         this.points = points;
-        if (Thread.currentThread().getThreadGroup().equals(SidedThreadGroups.SERVER)) {
-            ModPackets.sendToClient(new SyncPointsS2CPacket(ModConfigs.POINTS.points), (ServerPlayer) player);
+    }
+
+    public void addPoint(String point, int amount) {
+        if (this.points.containsKey(point)) {
+            this.points.put(point, this.points.get(point) + amount);
+        } else {
+            this.points.put(point, amount);
+        }
+        if (Thread.currentThread().getThreadGroup().equals(SidedThreadGroups.CLIENT)) {
+            ModPackets.sendToServer(new RequestPlayerPointsC2SPacket());
         }
     }
 
-    public void addPoint(String point, int amount, Player player) {
-        this.points.put(point, this.points.get(point) + amount);
-        if (Thread.currentThread().getThreadGroup().equals(SidedThreadGroups.SERVER)) {
-            ModPackets.sendToClient(new SyncPointsS2CPacket(ModConfigs.POINTS.points), (ServerPlayer) player);
+    public void addPoint(String point, int amount, ServerPlayer player) {
+        if (this.points.containsKey(point)) {
+            this.points.put(point, this.points.get(point) + amount);
+        } else {
+            this.points.put(point, amount);
         }
+        ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(getPoints()), player);
     }
 }
