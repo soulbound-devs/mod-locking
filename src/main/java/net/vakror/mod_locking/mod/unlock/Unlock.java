@@ -3,11 +3,9 @@ package net.vakror.mod_locking.mod.unlock;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.vakror.mod_locking.Tooltip;
 import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.config.ModConfigs;
@@ -15,10 +13,7 @@ import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.screen.ModUnlockingScreen;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Unlock<T extends Unlock> {
@@ -162,16 +157,97 @@ public class Unlock<T extends Unlock> {
     public List<Component> createDescription(ModUnlockingScreen screen) {
         List<Component> list = new ArrayList<>(3 + getCost().size());
 
+        if (!hasUnlocked(screen)) {
+            list.add(new Tooltip.TooltipComponentBuilder().addPart("Cost: ").setStyle(Style.EMPTY.withBold(true)).build().getTooltip());
 
+            getCost().forEach((name, amount) -> {
+                list.add(Component.literal(amount + " " + (amount > 1 ? ModPointsConfig.getPoint(name).pluralName : name)).setStyle(Style.EMPTY.withColor(screen.getMenu().getPointColors().get(name))));
+            });
 
-        list.add(new Tooltip.TooltipComponentBuilder().addPart("Cost: ").setStyle(Style.EMPTY.withBold(true)).build().getTooltip());
+            list.add(Component.empty());
+            if (requiredUnlocks != null && !requiredUnlocks[0].equals("")) {
+                for (String required : requiredUnlocks) {
+                    list.add(Component.literal("Requires: §e" + required));
+                }
+            }
 
+            if (!canUnlock(screen)) {
+                list.addAll(getReasonsWhyPlayerCannotAfford(screen));
+            }
+
+            list.add(Component.empty());
+        }
+
+        list.add(Component.literal(description));
+        return list;
+    }
+
+    public boolean hasUnlocked(ModUnlockingScreen screen) {
+        boolean unlocked = false;
+        for (ModTree tree : screen.getMenu().getPlayerTrees()) {
+            if (tree.modsUnlocked.contains(name)) {
+                unlocked = true;
+                break;
+            }
+        }
+        return unlocked;
+    }
+
+    public boolean canUnlock(ModUnlockingScreen screen) {
+        AtomicBoolean canAfford = new AtomicBoolean(true);
         getCost().forEach((name, amount) -> {
-            list.add(Component.literal(amount + " " + (amount > 1 ? ModPointsConfig.getPoint(name).pluralName: name)).setStyle(Style.EMPTY.withColor(screen.getMenu().getPointColors().get(name))));
+            if (screen.getMenu().getPlayerPoints().containsKey(name) && screen.getMenu().getPlayerPoints().get(name) >= amount) {
+                if (canAfford.get()) {
+                    canAfford.set(true);
+                }
+            } else {
+                canAfford.set(false);
+            }
         });
 
-        AtomicBoolean canAfford = new AtomicBoolean(true);
+        List<String> allModsUnlocked = new ArrayList<>();
+        for (ModTree tree : screen.getMenu().getPlayerTrees()) {
+            allModsUnlocked.addAll(tree.modsUnlocked);
+        }
+        for (String requiredUnlock : requiredUnlocks) {
+            if (!requiredUnlock.isBlank() && !allModsUnlocked.contains(requiredUnlock)) {
+                canAfford.set(false);
+            }
+        }
 
+        return canAfford.get();
+    }
+
+    public boolean canUnlock(Map<String, Integer> playerPoints, List<ModTree> playerTrees) {
+        AtomicBoolean canAfford = new AtomicBoolean(true);
+        getCost().forEach((name, amount) -> {
+            if (playerPoints.containsKey(name) && playerPoints.get(name) >= amount) {
+                if (canAfford.get()) {
+                    canAfford.set(true);
+                }
+            } else {
+                canAfford.set(false);
+            }
+        });
+
+        List<String> allModsUnlocked = new ArrayList<>();
+        for (ModTree tree : playerTrees) {
+            if (tree.modsUnlocked != null) {
+                allModsUnlocked.addAll(tree.modsUnlocked);
+            }
+        }
+        for (String requiredUnlock : requiredUnlocks) {
+            if (!requiredUnlock.isBlank() && !allModsUnlocked.contains(requiredUnlock)) {
+                canAfford.set(false);
+            }
+        }
+
+        return canAfford.get();
+    }
+
+    public List<Component> getReasonsWhyPlayerCannotAfford(ModUnlockingScreen screen) {
+        List<Component> reasonsWhyPlayerCannotAfford = new ArrayList<>(1 + requiredUnlocks.length);
+        AtomicBoolean canAfford = new AtomicBoolean(true);
         getCost().forEach((name, amount) -> {
             if (screen.getMenu().getPlayerPoints().containsKey(name) && screen.getMenu().getPlayerPoints().get(name) >= amount) {
                 if (canAfford.get()) {
@@ -183,19 +259,21 @@ public class Unlock<T extends Unlock> {
         });
 
         if (!canAfford.get()) {
-            list.add(Component.literal(""));
-            list.add(new Tooltip.TooltipComponentBuilder().addPart("You do not have enough points to afford this!", Tooltip.TooltipComponentBuilder.ColorCode.RED).build().getTooltip());
+            reasonsWhyPlayerCannotAfford.add(Component.literal(""));
+            reasonsWhyPlayerCannotAfford.add(new Tooltip.TooltipComponentBuilder().addPart("You do not have enough points to afford this!", Tooltip.TooltipComponentBuilder.ColorCode.RED).build().getTooltip());
         }
 
-        list.add(Component.empty());
-        if (requiredUnlocks != null && !requiredUnlocks[0].equals("")) {
-            for (String required : requiredUnlocks) {
-                list.add(Component.literal("Requires: §e" + required));
+        List<String> allModsUnlocked = new ArrayList<>();
+        for (ModTree tree : screen.getMenu().getPlayerTrees()) {
+            allModsUnlocked.addAll(tree.modsUnlocked);
+        }
+        for (String requiredUnlock : requiredUnlocks) {
+            if (!requiredUnlock.isBlank() && !allModsUnlocked.contains(requiredUnlock)) {
+                canAfford.set(false);
+                reasonsWhyPlayerCannotAfford.add(new Tooltip.TooltipComponentBuilder().addPart("You Cannot Unlock This Unless You Have Unlocked " + requiredUnlock + "!", Tooltip.TooltipComponentBuilder.ColorCode.RED).build().getTooltip());
             }
         }
-        list.add(Component.empty());
-        list.add(Component.literal(description));
-        return list;
+        return reasonsWhyPlayerCannotAfford;
     }
 
     public boolean restricts(Item item, Restriction.Type restrictionType) {
