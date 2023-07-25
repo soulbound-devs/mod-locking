@@ -5,6 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.vakror.mod_locking.mod.util.CodecUtils;
 
 public class KillEntityObtainMethod extends PointObtainMethod {
+
+
+    //TODO: Add optional particle and sound effects to be played when point is obtained
     public static Codec<KillEntityObtainMethod> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("pointType").forGetter(KillEntityObtainMethod::getPointType),
             Codec.STRING.fieldOf("type").forGetter((obtainMethod) -> getType()),

@@ -55,6 +55,24 @@ public class ModPackets {
                 .encoder(RequestPlayerPointsC2SPacket::encode)
                 .consumerNetworkThread(RequestPlayerPointsC2SPacket::handle)
                 .add();
+
+        net.messageBuilder(UnlockModWidgetC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(UnlockModWidgetC2SPacket::new)
+                .encoder(UnlockModWidgetC2SPacket::encode)
+                .consumerNetworkThread(UnlockModWidgetC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(SyncModWidgetDescriptionsS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncModWidgetDescriptionsS2CPacket::new)
+                .encoder(SyncModWidgetDescriptionsS2CPacket::encode)
+                .consumerNetworkThread(SyncModWidgetDescriptionsS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(SyncPlayerTreesS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncPlayerTreesS2CPacket::new)
+                .encoder(SyncPlayerTreesS2CPacket::encode)
+                .consumerNetworkThread(SyncPlayerTreesS2CPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG packet) {

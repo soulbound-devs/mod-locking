@@ -18,6 +18,9 @@ import static net.vakror.mod_locking.locking.Restriction.RESTRICTION_CODEC;
 import static net.vakror.mod_locking.mod.util.CodecUtils.*;
 
 public class ModUnlock extends Unlock<ModUnlock> {
+
+
+    //TODO: Add optional particle and sound effects to be played when unlocked
     public static final Codec<ModUnlock> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(ModUnlock::getName),
             POINT_MAP_CODEC.fieldOf("cost").forGetter(ModUnlock::getCost),

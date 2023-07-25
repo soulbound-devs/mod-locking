@@ -20,6 +20,9 @@ import net.vakror.mod_locking.locking.Restriction;
 import static net.vakror.mod_locking.mod.util.CodecUtils.*;
 
 public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
+
+
+    //TODO: Add optional particle and sound effects to be played when unlocked
     public static final Codec<FineGrainedModUnlock> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(FineGrainedModUnlock::getName),
             POINT_MAP_CODEC.fieldOf("cost").forGetter(FineGrainedModUnlock::getCost),

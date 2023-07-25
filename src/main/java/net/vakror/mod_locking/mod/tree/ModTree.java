@@ -90,7 +90,7 @@ public class ModTree implements INBTSerializable<CompoundTag> {
         this.name = name;
         this.backgroundTexture = backgroundTexture;
         this.icon = icon;
-        this.modsUnlocked = modsUnlocked;
+        this.modsUnlocked = new ArrayList<>(modsUnlocked);
         iconNbt.ifPresent(this::withIconNbt);
         centeredX.ifPresent(this::withStartScrollX);
         centeredY.ifPresent(this::withStartScrollY);
@@ -276,6 +276,9 @@ public class ModTree implements INBTSerializable<CompoundTag> {
     }
 
     public List<String> getModsUnlocked() {
+        if (modsUnlocked == null) {
+            modsUnlocked = new ArrayList<>();
+        }
         return modsUnlocked;
     }
 }

@@ -10,6 +10,7 @@ import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.point.ModPoint;
 import net.vakror.mod_locking.mod.util.CodecUtils;
+import net.vakror.mod_locking.screen.ModUnlockingScreen;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,9 @@ public class SyncPlayerPointsS2CPacket {
             Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
                 modTreeCapability.setPoints(playerPoints);
             }));
+            if (Minecraft.getInstance().screen instanceof ModUnlockingScreen unlockingScreen) {
+                unlockingScreen.getMenu().setPlayerPoints(playerPoints);
+            }
         });
         return true;
     }

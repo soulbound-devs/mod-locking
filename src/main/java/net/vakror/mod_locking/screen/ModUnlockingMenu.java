@@ -19,6 +19,7 @@ import java.util.Map;
 public class ModUnlockingMenu extends AbstractContainerMenu {
     protected List<ModTree> trees;
     protected Map<String, Integer> playerPoints;
+    protected List<ModTree> playerTrees;
     protected Map<String, Integer> pointColors;
     protected List<Unlock<?>> unlocks;
     protected Inventory playerInv;
@@ -27,14 +28,16 @@ public class ModUnlockingMenu extends AbstractContainerMenu {
         this.playerInv = inv;
         this.trees = ModConfigs.TREES.trees;
         this.playerPoints = inv.player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints();
+        this.playerTrees = inv.player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees();
         this.pointColors = inv.player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPointColors();
         this.unlocks = ModConfigs.UNLOCKS.getAll();
     }
-    protected ModUnlockingMenu(int syncId, Inventory inv, List<Unlock<?>> unlocks, List<ModTree> trees, Map<String, Integer> playerPoints) {
+    protected ModUnlockingMenu(int syncId, Inventory inv, List<Unlock<?>> unlocks, List<ModTree> trees, Map<String, Integer> playerPoints, List<ModTree> playerTrees) {
         super(ModMenuTypes.UNLOCK_TREE.get(), syncId);
         this.unlocks = unlocks;
         this.trees = trees;
         this.playerPoints = playerPoints;
+        this.playerTrees = playerTrees;
         this.playerInv = inv;
     }
 
@@ -48,6 +51,19 @@ public class ModUnlockingMenu extends AbstractContainerMenu {
 
     public Map<String, Integer> getPlayerPoints() {
         return playerPoints;
+    }
+
+    public List<ModTree> getPlayerTrees() {
+        return playerTrees;
+    }
+
+    public ModUnlockingMenu setPlayerTrees(List<ModTree> playerTrees) {
+        this.playerTrees = playerTrees;
+        return this;
+    }
+
+    public void setPlayerPoints(Map<String, Integer> playerPoints) {
+        this.playerPoints = playerPoints;
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.vakror.mod_locking.mod.util.CodecUtils;
 
 public class RightClickItemObtainMethod extends PointObtainMethod {
 
+    //TODO: Add optional particle and sound effects to be played when point is obtained
     public static Codec<RightClickItemObtainMethod> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("pointType").forGetter(RightClickItemObtainMethod::getPointType),
             Codec.STRING.fieldOf("item").forGetter(RightClickItemObtainMethod::getItem),

@@ -14,6 +14,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.vakror.mod_locking.mod.unlock.Unlock;
+import net.vakror.mod_locking.packet.ModPackets;
+import net.vakror.mod_locking.packet.UnlockModWidgetC2SPacket;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -39,13 +41,13 @@ public class ModWidget {
     private final Unlock unlock;
     private final Component title;
     private final int width;
-    private final List<Component> description;
+    public List<Component> description;
     private final Minecraft minecraft;
     @Nullable
     private List<ModWidget> parents;
     private final List<ModWidget> children = Lists.newArrayList();
     @Nullable
-    private boolean isDone;
+    private boolean unlocked;
     private final int x;
     private final int y;
 
@@ -58,6 +60,7 @@ public class ModWidget {
         this.y = Mth.floor(unlock.getY() * 27.0F);
         int l = 29 + minecraft.font.width(this.title);
         this.description = this.findOptimalLines(unlock.createDescription(treeTab.getScreen()), l);
+        this.unlocked = unlock.hasUnlocked(treeTab.getScreen());
 
         for(Component component : this.description) {
             l = Math.max(l, minecraft.font.width(component));
@@ -122,7 +125,7 @@ public class ModWidget {
     }
 
     public void draw(GuiGraphics graphics, int x, int y) {
-        AdvancementWidgetType widgetType = this.isDone ? AdvancementWidgetType.OBTAINED: AdvancementWidgetType.UNOBTAINED;
+        AdvancementWidgetType widgetType = this.unlocked ? AdvancementWidgetType.OBTAINED: AdvancementWidgetType.UNOBTAINED;
 
         graphics.blit(WIDGETS_LOCATION, x + this.x + 3, y + this.y, 26, 128 + widgetType.getIndex() * 26, 26, 26);
         ItemStack fakeUnlockStack = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon()))));
@@ -137,8 +140,8 @@ public class ModWidget {
         return this.width;
     }
 
-    public void setDone(boolean progress) {
-        this.isDone = progress;
+    public void setUnlocked(boolean progress) {
+        this.unlocked = progress;
     }
 
     public void addChild(ModWidget child) {
@@ -155,7 +158,7 @@ public class ModWidget {
         AdvancementWidgetType advancementwidgettype;
         AdvancementWidgetType advancementwidgettype1;
         AdvancementWidgetType advancementwidgettype2;
-        if (isDone) {
+        if (unlocked) {
             advancementwidgettype = AdvancementWidgetType.OBTAINED;
             advancementwidgettype1 = AdvancementWidgetType.OBTAINED;
             advancementwidgettype2 = AdvancementWidgetType.OBTAINED;
@@ -212,12 +215,19 @@ public class ModWidget {
         graphics.renderFakeItem(fakeUnlockStack, x + this.x + 8, y + this.y + 5);
     }
 
-    public boolean isMouseOver(int p_97260_, int p_97261_, int p_97262_, int p_97263_) {
-        int i = p_97260_ + this.x;
+    public void mouseClicked() {
+        if (this.unlock.canUnlock(this.tab.getScreen())) {
+            this.unlocked = true;
+            ModPackets.sendToServer(new UnlockModWidgetC2SPacket(this));
+        }
+    }
+
+    public boolean isMouseOver(int x, int y, double mouseX, double mouseY) {
+        int i = x + this.x;
         int j = i + 26;
-        int k = p_97261_ + this.y;
+        int k = y + this.y;
         int l = k + 26;
-        return p_97262_ >= i && p_97262_ <= j && p_97263_ >= k && p_97263_ <= l;
+        return mouseX >= i && mouseX <= j && mouseY >= k && mouseY <= l;
     }
 
     public void attachToParent() {

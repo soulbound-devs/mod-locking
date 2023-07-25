@@ -57,6 +57,9 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     private static int tabPage, maxPages;
     public String exceptionMessage;
 
+    public int currentMouseXPos = 0;
+    public int currentMouseYPos = 0;
+
     public ModUnlockingScreen(ModUnlockingMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
     }
@@ -99,21 +102,24 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     }
 
     @Override
-    public boolean mouseClicked(double p_97343_, double p_97344_, int p_97345_) {
-        if (p_97345_ == 0) {
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+        if (mouseButton == 0) {
             assert selectedTab != null;
             int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
             int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
 
             for(ModTreeTab tab : this.tabs.values()) {
-                if (tab.getPage() == tabPage && tab.isMouseOver(i, j, p_97343_, p_97344_)) {
+                if (tab.getPage() == tabPage && tab.isMouseOver(i, j, mouseX, mouseY)) {
                     selectedTab = tab;
                     System.out.println(selectedTab);
                 }
             }
+            int offsetX = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
+            int offsetY = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
+            this.selectedTab.mouseClicked(mouseX - offsetX - 9, mouseY - offsetY - 18);
         }
 
-        return super.mouseClicked(p_97343_, p_97344_, p_97345_);
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -121,6 +127,8 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         try {
             int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
             int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
+            this.currentMouseXPos = pMouseX;
+            this.currentMouseYPos = pMouseY;
             this.renderBackground(graphics);
             if (maxPages != 0) {
                 net.minecraft.network.chat.Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
@@ -174,20 +182,20 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         graphics.drawString(this.font, TITLE, x + 8, y + 6, 4210752, false);
     }
 
-    private void renderTooltips(GuiGraphics p_282784_, int p_283556_, int p_282458_, int p_281519_, int p_283371_) {
+    private void renderTooltips(GuiGraphics graphics, int mouseX, int mouseY, int offsetX, int offsetY) {
         if (this.selectedTab != null) {
-            p_282784_.pose().pushPose();
-            p_282784_.pose().translate((float)(p_281519_ + 9), (float)(p_283371_ + 18), 400.0F);
+            graphics.pose().pushPose();
+            graphics.pose().translate((float)(offsetX + 9), (float)(offsetY + 18), 400.0F);
             RenderSystem.enableDepthTest();
-            this.selectedTab.drawTooltips(p_282784_, p_283556_ - p_281519_ - 9, p_282458_ - p_283371_ - 18, p_281519_, p_283371_);
+            this.selectedTab.drawTooltips(graphics, mouseX - offsetX - 9, mouseY - offsetY - 18, offsetX, offsetY);
             RenderSystem.disableDepthTest();
-            p_282784_.pose().popPose();
+            graphics.pose().popPose();
         }
 
         if (this.tabs.size() > 1) {
             for(ModTreeTab tab : this.tabs.values()) {
-                if (tab.getPage() == tabPage && tab.isMouseOver(p_281519_, p_283371_, (double)p_283556_, (double)p_282458_)) {
-                    p_282784_.renderTooltip(this.font, tab.getTitle(), p_283556_, p_282458_);
+                if (tab.getPage() == tabPage && tab.isMouseOver(offsetX, offsetY, (double)mouseX, (double)mouseY)) {
+                    graphics.renderTooltip(this.font, tab.getTitle(), mouseX, mouseY);
                 }
             }
         }
@@ -307,6 +315,14 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         }));
 
         return tab.get();
+    }
+
+    public void updateDescriptions() {
+        for (ModTreeTab tab : this.tabs.values()) {
+            for (ModWidget widget : tab.getWidgets().values()) {
+                widget.description = widget.getUnlock().createDescription(this);
+            }
+        }
     }
 }
 

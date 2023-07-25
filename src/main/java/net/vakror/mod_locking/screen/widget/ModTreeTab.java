@@ -27,7 +27,7 @@ public class ModTreeTab {
     private final int index;
     private final ItemStack icon;
     private final Component title;
-    private final Map<Unlock, ModWidget> widgets = Maps.newLinkedHashMap();
+    private final Map<Unlock<?>, ModWidget> widgets = Maps.newLinkedHashMap();
     private double scrollX;
     private double scrollY;
     private int minX = Integer.MAX_VALUE;
@@ -75,6 +75,10 @@ public class ModTreeTab {
             this.minY = Math.min(this.minY, k);
             this.maxY = Math.max(this.maxY, l);
         }));
+    }
+
+    public Map<Unlock<?>, ModWidget> getWidgets() {
+        return widgets;
     }
 
     public int getPage() {
@@ -242,5 +246,16 @@ public class ModTreeTab {
 
     public int getMarginY() {
         return Math.max(this.tree.marginY, 30);
+    }
+
+    public void mouseClicked(double mouseX, double mouseY) {
+        int i = Mth.floor(this.scrollX);
+        int j = Mth.floor(this.scrollY);
+        for (ModWidget modWidget : this.widgets.values()) {
+            if (modWidget.isMouseOver(i, j, mouseX, mouseY)) {
+                modWidget.mouseClicked();
+                break;
+            }
+        }
     }
 }
