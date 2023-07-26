@@ -26,10 +26,8 @@ public class RequestPlayerPointsC2SPacket {
         NetworkEvent.Context context = sup.get();
         context.enqueueWork(() -> {
             AtomicReference<Map<String, Integer>> points = new AtomicReference<>(new HashMap<>());
-            ModConfigs.POINTS.points.forEach((point -> {
-                context.getSender().getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
-                    points.set(modTreeCapability.getPoints());
-                }));
+            context.getSender().getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
+                points.set(modTreeCapability.getPoints());
             }));
             ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(points.get()), context.getSender());
         });
