@@ -7,32 +7,23 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.command.ConfigCommand;
-import net.vakror.mod_locking.command.ReloadModLocksCommand;
+import net.vakror.mod_locking.command.ModLockingCommands;
 import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.config.ModConfigs;
-import net.vakror.mod_locking.mod.point.obtain.RightClickItemObtainMethod;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.tree.ModTrees;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
@@ -40,10 +31,9 @@ import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.packet.ModPackets;
 import net.vakror.mod_locking.packet.RequestAllDataC2SPacket;
 import net.vakror.mod_locking.packet.RequestPlayerPointsC2SPacket;
+import net.vakror.mod_locking.packet.RequestPlayerTreesC2SPacket;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class Events {
     public static void registerCapabilitiesEvent(RegisterCapabilitiesEvent event) {
@@ -116,7 +106,8 @@ public class Events {
     }
 
     public static void onCommandsRegister(RegisterCommandsEvent event) {
-        new ReloadModLocksCommand(event.getDispatcher());
+        new ModLockingCommands.ReloadModLocksCommand(event.getDispatcher());
+        new ModLockingCommands.ReloadPlayerTreeCommand(event.getDispatcher());
 
         ConfigCommand.register(event.getDispatcher());
     }

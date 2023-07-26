@@ -15,36 +15,28 @@ import net.vakror.mod_locking.packet.SyncPlayerPointsS2CPacket;
 import net.vakror.mod_locking.packet.SyncPlayerTreesS2CPacket;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ModTreeCapability {
-    List<ModTree> trees = null;
+    List<ModTree> trees = new ArrayList<>();
 
     Map<String, Integer> points = new HashMap<>();
+
     public void saveNBTData(CompoundTag nbt) {
         CompoundTag treeTag = new CompoundTag();
-        if (trees != null) {
-            for (ModTree tree : trees) {
-                treeTag.put("tree_" + tree.name, ModTree.CODEC_WITH_MODS_UNLOCKED.encodeStart(NbtOps.INSTANCE, tree).resultOrPartial((error) -> {
-                    throw new IllegalStateException(error);
-                }).get());
-            }
-            nbt.put("trees", treeTag);
+        for (ModTree tree: trees) {
+            treeTag.put("tree_" + tree.name, ModTree.CODEC_WITH_MODS_UNLOCKED.encodeStart(NbtOps.INSTANCE, tree).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
         }
         nbt.put("points", ModPoint.MAP_CODEC.encodeStart(NbtOps.INSTANCE, points).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
+        nbt.put("trees", treeTag);
     }
 
     public ModTreeCapability loadNBTData(CompoundTag nbt) {
         CompoundTag treeTag = nbt.getCompound("trees");
         CompoundTag pointTag = nbt.getCompound("points");
-        if (treeTag != null) {
-            treeTag.getAllKeys().forEach((key) -> {
-                trees = new ArrayList<>();
-                trees.add(ModTree.CODEC_WITH_MODS_UNLOCKED.parse(NbtOps.INSTANCE, treeTag.getCompound(key)).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
-            });
-            points = new HashMap<>(ModPoint.MAP_CODEC.parse(NbtOps.INSTANCE, pointTag).resultOrPartial((error) -> {
-                throw new IllegalStateException(error);
-            }).get());
-        }
+        treeTag.getAllKeys().forEach((key) -> trees.add(ModTree.CODEC_WITH_MODS_UNLOCKED.parse(NbtOps.INSTANCE, treeTag.getCompound(key)).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get()));
+        points = new HashMap<>(ModPoint.MAP_CODEC.parse(NbtOps.INSTANCE, pointTag).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
 
         return this;
     }
@@ -138,5 +130,55 @@ public class ModTreeCapability {
                 break;
             }
         }
+    }
+
+    public void updateTrees() {
+        Map<ModTree, List<String>> modsUnlocked = new HashMap<>();
+        for (ModTree tree : this.trees) {
+            modsUnlocked.put(tree, tree.modsUnlocked);
+        }
+        List<ModTree> playerTrees = this.trees;
+        this.trees.clear();
+        for (ModTree tree : ModConfigs.TREES.trees) {
+            if (modsUnlockedContainsTreeOfName(modsUnlocked, tree.name)) {
+                trees.add(tree.withUnlocks(getModsUnlockedOfTreeName(modsUnlocked, tree.name)));
+                modsUnlocked.remove(getModsUnlockedTreeOfName(modsUnlocked, tree.name));
+            } else {
+                trees.add(tree);
+            }
+        }
+        if (!modsUnlocked.isEmpty()) {
+            trees.addAll(modsUnlocked.keySet());
+        }
+    }
+
+    public boolean modsUnlockedContainsTreeOfName(Map<ModTree, List<String>> modsUnlocked, String name) {
+        AtomicBoolean toReturn = new AtomicBoolean(false);
+        modsUnlocked.forEach(((tree, unlocked) -> {
+            if (tree.name.equals(name)) {
+                toReturn.set(true);
+            }
+        }));
+        return toReturn.get();
+    }
+
+    public List<String> getModsUnlockedOfTreeName(Map<ModTree, List<String>> modsUnlocked, String name) {
+        List<String> unlocks = new ArrayList<>();
+        modsUnlocked.forEach(((tree, unlocked) -> {
+            if (tree.name.equals(name)) {
+                unlocks.addAll(unlocked);
+            }
+        }));
+        return unlocks;
+    }
+
+    public ModTree getModsUnlockedTreeOfName(Map<ModTree, List<String>> modsUnlocked, String name) {
+        AtomicReference<ModTree> toReturn = new AtomicReference<>(null);
+        modsUnlocked.forEach(((tree, unlocked) -> {
+            if (tree.name.equals(name)) {
+                toReturn.set(tree);
+            }
+        }));
+        return toReturn.get();
     }
 }

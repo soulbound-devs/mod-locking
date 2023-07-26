@@ -281,4 +281,9 @@ public class ModTree implements INBTSerializable<CompoundTag> {
         }
         return modsUnlocked;
     }
+
+    public ModTree withUnlocks(List<String> modsUnlocked) {
+        this.modsUnlocked = modsUnlocked;
+        return this;
+    }
 }
