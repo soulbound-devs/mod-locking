@@ -73,6 +73,12 @@ public class ModPackets {
                 .encoder(SyncPlayerTreesS2CPacket::encode)
                 .consumerNetworkThread(SyncPlayerTreesS2CPacket::handle)
                 .add();
+
+        net.messageBuilder(RequestPlayerTreesC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(RequestPlayerTreesC2SPacket::new)
+                .encoder(RequestPlayerTreesC2SPacket::encode)
+                .consumerNetworkThread(RequestPlayerTreesC2SPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG packet) {
