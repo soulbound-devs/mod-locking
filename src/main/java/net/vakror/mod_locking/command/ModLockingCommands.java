@@ -12,9 +12,6 @@ import net.vakror.mod_locking.packet.ModPackets;
 import net.vakror.mod_locking.packet.SyncAllDataS2CPacket;
 import net.vakror.mod_locking.packet.SyncPlayerTreesS2CPacket;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ModLockingCommands {
     public static class ReloadModLocksCommand {
         public ReloadModLocksCommand(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -27,7 +24,7 @@ public class ModLockingCommands {
         private int execute(CommandContext<CommandSourceStack> context) {
             try {
                 ModConfigs.register(false);
-                ModPackets.sendToClients(new SyncAllDataS2CPacket(ModConfigs.POINTS.points, ModConfigs.UNLOCKS.getAll(), ModConfigs.TREES.trees, ModConfigs.POINT_OBTAIN_METHODS.getAll(), true));
+                ModPackets.sendToClients(new SyncAllDataS2CPacket(ModConfigs.POINTS.points, ModConfigs.MOD_UNLOCKS.getAll(), ModConfigs.TREES.trees, ModConfigs.USE_ITEM_POINT_OBTAIN_METHODS.getAll(), true));
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -31,7 +31,7 @@ public class UnlockModWidgetC2SPacket {
     public boolean handle(Supplier<NetworkEvent.Context> sup) {
         NetworkEvent.Context context = sup.get();
         context.enqueueWork(() -> {
-            for (Unlock<?> unlock : ModConfigs.UNLOCKS.getAll()) {
+            for (Unlock<?> unlock : ModConfigs.MOD_UNLOCKS.getAll()) {
                 if (unlock.getName().equals(unlockName)) {
                     assert context.getSender() != null;
                     ModTreeCapability tree = context.getSender().getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability());

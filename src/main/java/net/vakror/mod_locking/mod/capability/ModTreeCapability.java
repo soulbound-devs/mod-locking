@@ -181,4 +181,9 @@ public class ModTreeCapability {
         }));
         return toReturn.get();
     }
+
+    public void copyFrom(ModTreeCapability oldStore) {
+        this.trees = oldStore.trees;
+        this.points = oldStore.points;
+    }
 }

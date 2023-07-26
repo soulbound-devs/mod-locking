@@ -12,11 +12,14 @@ import net.vakror.mod_locking.mod.point.obtain.RightClickItemObtainMethod;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.ModUnlock;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class Config {
+public abstract class Config<P extends ConfigObject> {
     private static final Gson GSON = new GsonBuilder().enableComplexMapKeySerialization()
             .registerTypeAdapter(CompoundTag.class, CompoundTagAdapter.INSTANCE)
             .registerTypeAdapter(ModUnlock.class, ModUnlockAdapter.INSTANCE)
@@ -37,13 +40,21 @@ public abstract class Config {
         }
     }
 
-    private File getConfigFile() {
-        File configDir = FMLPaths.CONFIGDIR.get().resolve("mod-locking/config/").toFile();
-        if (!configDir.exists() && configDir.mkdirs()) {
-            return new File(configDir, getName() + ".json");
-        }
-        return new File(configDir, getName() + ".json");
+    @NotNull
+    private File getConfigDir() {
+        File configDir;
+        configDir = FMLPaths.CONFIGDIR.get().resolve("mod-locking/" + getSubPath()).toFile();
+        return configDir;
     }
+
+    @NotNull
+    private File getConfigFile(String fileName) {
+        File configDir;
+        configDir = FMLPaths.CONFIGDIR.get().resolve("mod-locking/" + getSubPath() + "/" + fileName + ".json").toFile();
+        return configDir;
+    }
+
+    public abstract String getSubPath();
 
     public abstract String getName();
 
@@ -51,37 +62,36 @@ public abstract class Config {
         return this.getName();
     }
 
-    public <T extends Config> T readConfig(boolean overrideCurrent) {
+    public void readConfig(boolean overrideCurrent, Class<P> type) {
         if (!overrideCurrent) {
-            ModLockingMod.LOGGER.info("Reading config: " + this.getName());
-            try (FileReader reader = new FileReader(this.getConfigFile())) {
-                Config config = GSON.fromJson(reader, this.getClass());
-                config.onLoad(this);
-                if (!config.isValid()) {
-                    ModLockingMod.LOGGER.error("Invalid config {}, using defaults", this);
-                    config.reset();
+            ModLockingMod.LOGGER.info("Reading configs: " + this.getName());
+            File[] configFiles = this.getConfigDir().listFiles(File::isFile);
+            if (configFiles != null && configFiles.length != 0) {
+                for (File file : configFiles) {
+                    try (FileReader reader = new FileReader(file)) {
+                        P object = (P) GSON.fromJson(reader, type);
+                        this.add(object);
+                    } catch (IOException e) {
+                        System.out.println(e.getClass());
+                        e.printStackTrace();
+                        ModLockingMod.LOGGER.warn("Error with config {}, generating new", this);
+                        this.generateConfig();
+                    }
                 }
-                Config config2 = config;
-                return (T) config2;
-            } catch (IOException e) {
-                System.out.println(e.getClass());
-                e.printStackTrace();
-                ModLockingMod.LOGGER.warn("Config file {} not found, generating new", this);
+            } else {
                 this.generateConfig();
-                return (T) this;
+                ModLockingMod.LOGGER.warn("Config " + this.getName() + "not found, generating new");
             }
         } else {
             this.generateConfig();
             ModLockingMod.LOGGER.info("Successfully Overwrote Config: " + this.getName());
-            return (T) this;
         }
     }
 
+    public abstract void add(P object);
+
     protected boolean isValid() {
         return true;
-    }
-
-    protected void onLoad(Config oldConfigInstance) {
     }
 
     public static boolean checkAllFieldsAreNotNull(Object o) throws IllegalAccessException {
@@ -98,21 +108,21 @@ public abstract class Config {
         return true;
     }
 
+    public abstract List<P> getObjects();
+
     protected abstract void reset();
 
     public void writeConfig() throws IOException {
-        File cfgFile = this.getConfigFile();
-        File dir = cfgFile.getParentFile();
-        if (!dir.exists() && !dir.mkdirs()) {
+        File cfgDIr = this.getConfigDir();
+        if (!cfgDIr.exists() && !cfgDIr.mkdirs()) {
             return;
         }
-        if (!cfgFile.exists() && !cfgFile.createNewFile()) {
-            return;
+        for (P object : getObjects()) {
+            FileWriter writer = new FileWriter(getConfigFile(object.getFileName().replaceAll(" ", "_").replaceAll("[^A-Za-z0-9_]", "").toLowerCase()));
+            GSON.toJson(object, writer);
+            writer.flush();
+            writer.close();
         }
-        FileWriter writer = new FileWriter(cfgFile);
-        GSON.toJson(this, writer);
-        writer.flush();
-        writer.close();
     }
 }
 

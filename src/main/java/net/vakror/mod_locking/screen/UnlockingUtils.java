@@ -22,7 +22,7 @@ public class UnlockingUtils {
 
             @Override
             public @NotNull AbstractContainerMenu createMenu(int syncId, @NotNull Inventory inv, @NotNull Player player) {
-                return new ModUnlockingMenu(syncId, inv, ModConfigs.UNLOCKS.getAll(), ModConfigs.TREES.trees, player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints(), player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees());
+                return new ModUnlockingMenu(syncId, inv, ModConfigs.MOD_UNLOCKS.getAll(), ModConfigs.TREES.trees, player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints(), player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees());
             }
         });
     }

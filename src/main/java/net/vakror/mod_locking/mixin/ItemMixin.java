@@ -39,7 +39,7 @@ public abstract class ItemMixin {
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void addPointsOnUse(Level level, Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
         if (!level.isClientSide) {
-            for (RightClickItemObtainMethod useItemObtainMethod : ModConfigs.POINT_OBTAIN_METHODS.useItemObtainMethods) {
+            for (RightClickItemObtainMethod useItemObtainMethod : ModConfigs.USE_ITEM_POINT_OBTAIN_METHODS.useItemObtainMethods) {
                 if (useItemObtainMethod.itemId.equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(player.getItemInHand(hand).getItem())).toString())) {
                     if (player.getItemInHand(hand).getCount() > 0) {
                         player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {

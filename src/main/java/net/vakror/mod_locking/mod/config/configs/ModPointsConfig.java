@@ -8,13 +8,28 @@ import net.vakror.mod_locking.mod.point.ModPoint;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModPointsConfig extends Config {
+public class ModPointsConfig extends Config<ModPoint> {
     @Expose
     public List<ModPoint> points = new ArrayList<>();
 
     @Override
+    public String getSubPath() {
+        return "points";
+    }
+
+    @Override
     public String getName() {
         return "points";
+    }
+
+    @Override
+    public void add(ModPoint object) {
+        points.add(object);
+    }
+
+    @Override
+    public List<ModPoint> getObjects() {
+        return points;
     }
 
     @Override

@@ -17,12 +17,12 @@ public class KillEntityObtainMethod extends PointObtainMethod {
     public String entityId;
 
     public KillEntityObtainMethod(String entity, int amount, String pointType) {
-        super(amount, pointType);
+        super(pointType + "_" + entity + "_kill_method", amount, pointType);
         this.entityId = entity;
     }
 
     public KillEntityObtainMethod(String pointType, String type, String entity, int amount) {
-        super(amount, pointType);
+        super(pointType + "_" + entity + "_kill_method", amount, pointType);
         this.entityId = entity;
     }
 

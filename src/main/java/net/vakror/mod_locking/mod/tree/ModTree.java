@@ -6,20 +6,18 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.vakror.mod_locking.locking.Restriction;
+import net.vakror.mod_locking.mod.config.ConfigObject;
 import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 
-public class ModTree implements INBTSerializable<CompoundTag> {
+public class ModTree implements INBTSerializable<CompoundTag>, ConfigObject {
 
     public static final Codec<ModTree> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(ModTree::getName),
@@ -153,7 +151,7 @@ public class ModTree implements INBTSerializable<CompoundTag> {
 
     public <P> String restrictedBy(P item, Restriction.Type restrictionType) {
         StringBuilder sb = new StringBuilder();
-        for (Unlock<?> unlock : ModConfigs.UNLOCKS.getAll()) {
+        for (Unlock<?> unlock : ModConfigs.MOD_UNLOCKS.getAll()) {
             if (modsUnlocked == null) modsUnlocked = new ArrayList<>();
             if (unlock.getTreeName().equals(name)) {
                 if (this.modsUnlocked.contains(unlock.getName()) || !unlock.restricts(item, restrictionType, true)) continue;
@@ -285,5 +283,10 @@ public class ModTree implements INBTSerializable<CompoundTag> {
     public ModTree withUnlocks(List<String> modsUnlocked) {
         this.modsUnlocked = modsUnlocked;
         return this;
+    }
+
+    @Override
+    public String getFileName() {
+        return name;
     }
 }

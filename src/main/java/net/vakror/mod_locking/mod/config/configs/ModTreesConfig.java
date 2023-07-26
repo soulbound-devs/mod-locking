@@ -9,13 +9,28 @@ import net.vakror.mod_locking.mod.tree.ModTree;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModTreesConfig extends Config {
+public class ModTreesConfig extends Config<ModTree> {
     @Expose
     public List<ModTree> trees = new ArrayList<>();
 
     @Override
+    public String getSubPath() {
+        return "mod_trees";
+    }
+
+    @Override
     public String getName() {
         return "mod_trees";
+    }
+
+    @Override
+    public void add(ModTree object) {
+        trees.add(object);
+    }
+
+    @Override
+    public List<ModTree> getObjects() {
+        return trees;
     }
 
     @Override

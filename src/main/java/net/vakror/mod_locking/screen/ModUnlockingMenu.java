@@ -30,7 +30,7 @@ public class ModUnlockingMenu extends AbstractContainerMenu {
         this.playerPoints = inv.player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints();
         this.playerTrees = inv.player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees();
         this.pointColors = inv.player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPointColors();
-        this.unlocks = ModConfigs.UNLOCKS.getAll();
+        this.unlocks = ModConfigs.MOD_UNLOCKS.getAll();
     }
     protected ModUnlockingMenu(int syncId, Inventory inv, List<Unlock<?>> unlocks, List<ModTree> trees, Map<String, Integer> playerPoints, List<ModTree> playerTrees) {
         super(ModMenuTypes.UNLOCK_TREE.get(), syncId);

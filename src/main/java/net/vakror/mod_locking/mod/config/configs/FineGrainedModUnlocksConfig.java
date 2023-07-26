@@ -3,19 +3,17 @@ package net.vakror.mod_locking.mod.config.configs;
 import com.google.gson.annotations.Expose;
 import net.vakror.mod_locking.mod.config.Config;
 import net.vakror.mod_locking.mod.config.ModConfigs;
-import net.vakror.mod_locking.mod.unlock.ModUnlock;
+import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class ModUnlocksConfig extends Config<ModUnlock> {
+public class FineGrainedModUnlocksConfig extends Config<FineGrainedModUnlock> {
     @Expose
-    public List<ModUnlock> modUnlocks = new ArrayList<>();
-
-    @Override
-    public String getSubPath() {
-        return "unlocks/mod";
-    }
+    public List<FineGrainedModUnlock> fineGrainedUnlocks = new ArrayList<>();
 
     @Override
     public String getName() {
@@ -23,19 +21,23 @@ public class ModUnlocksConfig extends Config<ModUnlock> {
     }
 
     @Override
-    public void add(ModUnlock object) {
-        this.modUnlocks.add(object);
+    public String getSubPath() {
+        return "unlocks/fine-grained";
+    }
+    @Override
+    public void add(FineGrainedModUnlock object) {
+        this.fineGrainedUnlocks.add(object);
     }
 
     @Override
-    public List<ModUnlock> getObjects() {
-        return modUnlocks;
+    public List<FineGrainedModUnlock> getObjects() {
+        return fineGrainedUnlocks;
     }
 
     public List<Unlock<?>> getAll() {
         List<Unlock<?>> all = new ArrayList<>();
-        all.addAll(modUnlocks);
-        all.addAll(ModConfigs.FINE_GRAINED_MOD_UNLOCKS.fineGrainedUnlocks);
+        all.addAll(ModConfigs.MOD_UNLOCKS.modUnlocks);
+        all.addAll(fineGrainedUnlocks);
         return all;
     }
     @Override

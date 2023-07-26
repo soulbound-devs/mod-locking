@@ -17,6 +17,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -178,7 +179,7 @@ public class Events {
     }
 
     public static void onEntityDeath(LivingDeathEvent event) {
-        ModConfigs.POINT_OBTAIN_METHODS.killEntityObtainMethods.forEach((killEntityObtainMethod -> {
+        ModConfigs.KILL_ENTITY_POINT_OBTAIN_METHODS.killEntityObtainMethods.forEach((killEntityObtainMethod -> {
             if (event.getEntity().getType().equals(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(killEntityObtainMethod.entityId)))) {
                 if (event.getSource().getEntity() instanceof Player player) {
                     player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> modTreeCapability.addPoint(killEntityObtainMethod.getPointType(), killEntityObtainMethod.getAmount(), (ServerPlayer) player)));

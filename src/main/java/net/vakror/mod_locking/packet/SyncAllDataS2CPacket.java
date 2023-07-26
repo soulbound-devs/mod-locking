@@ -5,9 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.network.NetworkEvent;
-import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.point.ModPoint;
 import net.vakror.mod_locking.mod.point.obtain.KillEntityObtainMethod;
@@ -18,9 +16,6 @@ import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.ModUnlock;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -126,24 +121,24 @@ public class SyncAllDataS2CPacket {
 
             ModConfigs.POINTS.points.clear();
             ModConfigs.POINTS.points.addAll(points);
-            ModConfigs.UNLOCKS.modUnlocks = new ArrayList<>();
-            ModConfigs.UNLOCKS.fineGrainedUnlocks = new ArrayList<>();
+            ModConfigs.MOD_UNLOCKS.modUnlocks = new ArrayList<>();
+            ModConfigs.FINE_GRAINED_MOD_UNLOCKS.fineGrainedUnlocks = new ArrayList<>();
             ModConfigs.TREES.trees = trees;
-            ModConfigs.POINT_OBTAIN_METHODS.killEntityObtainMethods.clear();
-            ModConfigs.POINT_OBTAIN_METHODS.useItemObtainMethods.clear();
+            ModConfigs.KILL_ENTITY_POINT_OBTAIN_METHODS.killEntityObtainMethods.clear();
+            ModConfigs.USE_ITEM_POINT_OBTAIN_METHODS.useItemObtainMethods.clear();
             for (PointObtainMethod pointObtainMethod : pointObtainMethods) {
                 if (pointObtainMethod instanceof KillEntityObtainMethod) {
-                    ModConfigs.POINT_OBTAIN_METHODS.killEntityObtainMethods.add((KillEntityObtainMethod) pointObtainMethod);
+                    ModConfigs.KILL_ENTITY_POINT_OBTAIN_METHODS.killEntityObtainMethods.add((KillEntityObtainMethod) pointObtainMethod);
                 }
                 if (pointObtainMethod instanceof RightClickItemObtainMethod) {
-                    ModConfigs.POINT_OBTAIN_METHODS.useItemObtainMethods.add((RightClickItemObtainMethod) pointObtainMethod);
+                    ModConfigs.USE_ITEM_POINT_OBTAIN_METHODS.useItemObtainMethods.add((RightClickItemObtainMethod) pointObtainMethod);
                 }
             }
             this.unlocks.forEach((unlock -> {
                 if (unlock instanceof FineGrainedModUnlock fineGrainedModUnlock) {
-                    ModConfigs.UNLOCKS.fineGrainedUnlocks.add(fineGrainedModUnlock);
+                    ModConfigs.FINE_GRAINED_MOD_UNLOCKS.add(fineGrainedModUnlock);
                 } else if (unlock instanceof ModUnlock modUnlock) {
-                    ModConfigs.UNLOCKS.modUnlocks.add(modUnlock);
+                    ModConfigs.MOD_UNLOCKS.add(modUnlock);
                 }
             }));
             if (reloaded) {

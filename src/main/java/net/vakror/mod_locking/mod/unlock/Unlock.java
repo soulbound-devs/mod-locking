@@ -8,6 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.vakror.mod_locking.Tooltip;
 import net.vakror.mod_locking.locking.Restriction;
+import net.vakror.mod_locking.mod.config.ConfigObject;
 import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
 import net.vakror.mod_locking.mod.tree.ModTree;
@@ -16,7 +17,7 @@ import net.vakror.mod_locking.screen.ModUnlockingScreen;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Unlock<T extends Unlock> {
+public class Unlock<T extends Unlock> implements ConfigObject {
     protected String name;
     protected Map<String, Integer> cost;
 
@@ -55,6 +56,10 @@ public class Unlock<T extends Unlock> {
     }
 
     public String getName() {
+        return name;
+    }
+
+    public String getFileName() {
         return name;
     }
 
@@ -99,7 +104,7 @@ public class Unlock<T extends Unlock> {
 
         List<Unlock<?>> unlocks = new ArrayList<>();
 
-        for (Unlock<?> unlock: ModConfigs.UNLOCKS.getAll()) {
+        for (Unlock<?> unlock: ModConfigs.MOD_UNLOCKS.getAll()) {
             for (String requiredUnlock: this.requiredUnlocks) {
                 if (unlock.getName().equals(requiredUnlock)) {
                     unlocks.add(unlock);
