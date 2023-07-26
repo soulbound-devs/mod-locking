@@ -185,9 +185,6 @@ public class ModWidget {
         this.unlocked = progress;
     }
 
-    public void addChild(ModWidget child) {
-        this.children.add(child);
-    }
     public Unlock<?> getUnlock() {
         return unlock;
     }
@@ -274,9 +271,6 @@ public class ModWidget {
     public void attachToParent() {
         if (this.parents == null && this.unlock.getParents() != null) {
             this.parents = this.getParents(this.unlock);
-            if (this.parents != null) {
-                this.parents.forEach((parent) -> parent.addChild(this));
-            }
         }
     }
 
