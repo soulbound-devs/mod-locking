@@ -9,10 +9,13 @@ import net.minecraft.client.gui.screens.advancements.AdvancementWidgetType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 import net.vakror.mod_locking.packet.ModPackets;
 import net.vakror.mod_locking.packet.UnlockModWidgetC2SPacket;
@@ -21,6 +24,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ModWidget {
     private static final ResourceLocation WIDGETS_LOCATION = new ResourceLocation("textures/gui/advancements/widgets.png");
@@ -41,11 +45,10 @@ public class ModWidget {
     private final Unlock unlock;
     private final Component title;
     private final int width;
-    public List<Component> description;
+    public List<Component> description = new ArrayList<>();
     private final Minecraft minecraft;
     @Nullable
     private List<ModWidget> parents;
-    private final List<ModWidget> children = Lists.newArrayList();
     @Nullable
     private boolean unlocked;
     private final int x;
@@ -58,15 +61,45 @@ public class ModWidget {
         this.title = Component.literal(unlock.getName());
         this.x = Mth.floor(unlock.getX() * 28.0F);
         this.y = Mth.floor(unlock.getY() * 27.0F);
-        int l = 29 + minecraft.font.width(this.title);
-        this.description = this.findOptimalLines(unlock.createDescription(treeTab.getScreen()), l);
+        final int[] l = {29 + minecraft.font.width(this.title)};
+        if (!unlock.getReasonsWhyPlayerCannotAfford(this.tab.getScreen()).isEmpty()) {
+            int newL = 29 + minecraft.font.width(unlock.getReasonsWhyPlayerCannotAfford(this.tab.getScreen()).get(1));
+            if (newL > l[0]) {
+                l[0] = newL;
+            }
+        }
+        if (unlock.getRequiredUnlocks() != null) {
+            for (String requiredUnlock : unlock.getRequiredUnlocks()) {
+                int newL = 29 + minecraft.font.width("Requires: " + requiredUnlock);
+                if (newL > l[0]) l[0] = newL;
+            }
+        }
+        if (unlock.getCost() != null) {
+            unlock.getCost().forEach((pointName, amount) -> {
+                String pointAmountString = amount + " " + (amount > 1 ? ModPointsConfig.getPoint(pointName).pluralName : pointName);
+                int newL = 29 + minecraft.font.width(pointAmountString);
+                if (newL > l[0]) l[0] = newL;
+            });
+        }
+        List<FormattedText> tooltipLines = this.findOptimalLines(unlock.createDescription(treeTab.getScreen()), l[0]);
+        tooltipLines.forEach((tooltipLine) -> {
+            MutableComponent component = Component.literal(tooltipLine.getString());
+            tooltipLine.visit(((pStyle, pContent) -> {
+                component.setStyle(pStyle);
+                return Optional.empty();
+            }), Style.EMPTY);
+            this.description.add(component);
+            if (!tooltipLine.getString().equals("Cost: ")) {
+                this.description.add(Component.empty());
+            }
+        });
         this.unlocked = unlock.hasUnlocked(treeTab.getScreen());
 
         for(Component component : this.description) {
-            l = Math.max(l, minecraft.font.width(component));
+            l[0] = Math.max(l[0], minecraft.font.width(component));
         }
 
-        this.width = l + 3 + 5;
+        this.width = l[0] + 3 + 5;
     }
 
     private static float getMaxWidth(StringSplitter p_97304_, List<FormattedText> p_97305_) {
@@ -74,8 +107,16 @@ public class ModWidget {
     }
 
     // find TOOLTIP lines!
-    private List<Component> findOptimalLines(List<Component> components, int p_97310_) {
-        return components;
+    private List<FormattedText> findOptimalLines(List<Component> components, int pMaxWidth) {
+        StringSplitter stringsplitter = this.minecraft.font.getSplitter();
+        List<FormattedText> list = new ArrayList<>();
+
+        for (Component component : components) {
+            List<FormattedText> list1 = stringsplitter.splitLines(component, pMaxWidth - 0, component.getStyle());
+            list.addAll(list1);
+        }
+
+        return list;
     }
 
     @Nullable
