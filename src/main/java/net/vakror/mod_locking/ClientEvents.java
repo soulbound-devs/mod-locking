@@ -43,7 +43,7 @@ public class ClientEvents {
 
         @SubscribeEvent
         public static void registerGuiOverlay(RegisterGuiOverlaysEvent event) {
-            event.registerBelowAll("point", PointOverlay.POINT_HUD);
+            event.registerAboveAll("point", PointOverlay.POINT_HUD);
         }
     }
 
