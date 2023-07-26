@@ -70,6 +70,7 @@ public class Events {
     public static void onPlayerLogIn(ClientPlayerNetworkEvent.LoggingIn event) {
         ModPackets.sendToServer(new RequestAllDataC2SPacket());
         ModPackets.sendToServer(new RequestPlayerPointsC2SPacket());
+        ModPackets.sendToServer(new RequestPlayerTreesC2SPacket());
     }
 
     public static void onBlockInteraction(PlayerInteractEvent.RightClickBlock event) {
