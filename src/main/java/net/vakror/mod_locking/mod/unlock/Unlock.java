@@ -245,9 +245,41 @@ public class Unlock<T extends Unlock> {
         return canAfford.get();
     }
 
+    public boolean canUnlock(Map<String, Integer> playerPoints, List<ModTree> playerTrees, boolean a) {
+        AtomicBoolean canAfford = new AtomicBoolean(true);
+        getCost().forEach((name, amount) -> {
+            if (playerPoints.containsKey(name) && playerPoints.get(name) >= amount) {
+                if (canAfford.get()) {
+                    canAfford.set(true);
+                }
+            } else {
+                canAfford.set(false);
+            }
+        });
+
+        List<String> allModsUnlocked = new ArrayList<>();
+        for (ModTree tree : playerTrees) {
+            if (tree.modsUnlocked != null) {
+                allModsUnlocked.addAll(tree.modsUnlocked);
+            }
+        }
+        for (String requiredUnlock : requiredUnlocks) {
+            if (!requiredUnlock.isBlank() && !allModsUnlocked.contains(requiredUnlock)) {
+                canAfford.set(false);
+            }
+        }
+
+        if (canAfford.get() && allModsUnlocked.contains(this.name)) {
+            canAfford.set(false);
+        }
+
+        return canAfford.get();
+    }
+
     public List<Component> getReasonsWhyPlayerCannotAfford(ModUnlockingScreen screen) {
         List<Component> reasonsWhyPlayerCannotAfford = new ArrayList<>(1 + requiredUnlocks.length);
         AtomicBoolean canAfford = new AtomicBoolean(true);
+        Arrays.stream(this.requiredUnlocks).toList();
         getCost().forEach((name, amount) -> {
             if (screen.getMenu().getPlayerPoints().containsKey(name) && screen.getMenu().getPlayerPoints().get(name) >= amount) {
                 if (canAfford.get()) {
@@ -260,7 +292,7 @@ public class Unlock<T extends Unlock> {
 
         if (!canAfford.get()) {
             reasonsWhyPlayerCannotAfford.add(Component.literal(""));
-            reasonsWhyPlayerCannotAfford.add(new Tooltip.TooltipComponentBuilder().addPart("You do not have enough points to afford this!", Tooltip.TooltipComponentBuilder.ColorCode.RED).build().getTooltip());
+            reasonsWhyPlayerCannotAfford.add(new Tooltip.TooltipComponentBuilder().addPart("You can't Afford This", Tooltip.TooltipComponentBuilder.ColorCode.RED).build().getTooltip());
         }
 
         List<String> allModsUnlocked = new ArrayList<>();
@@ -270,7 +302,6 @@ public class Unlock<T extends Unlock> {
         for (String requiredUnlock : requiredUnlocks) {
             if (!requiredUnlock.isBlank() && !allModsUnlocked.contains(requiredUnlock)) {
                 canAfford.set(false);
-                reasonsWhyPlayerCannotAfford.add(new Tooltip.TooltipComponentBuilder().addPart("You Cannot Unlock This Unless You Have Unlocked " + requiredUnlock + "!", Tooltip.TooltipComponentBuilder.ColorCode.RED).build().getTooltip());
             }
         }
         return reasonsWhyPlayerCannotAfford;

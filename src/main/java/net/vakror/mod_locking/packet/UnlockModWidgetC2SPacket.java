@@ -35,7 +35,7 @@ public class UnlockModWidgetC2SPacket {
                 if (unlock.getName().equals(unlockName)) {
                     assert context.getSender() != null;
                     ModTreeCapability tree = context.getSender().getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability());
-                    if (unlock.canUnlock(tree.getPoints(), tree.getTrees())) {
+                    if (unlock.canUnlock(tree.getPoints(), tree.getTrees(), true)) {
                         context.getSender().getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).addUnlockedUnlock(unlock, context.getSender());
 
                         AtomicReference<Map<String, Integer>> points = new AtomicReference<>(new HashMap<>());
