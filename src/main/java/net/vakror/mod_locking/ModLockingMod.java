@@ -40,6 +40,7 @@ public class ModLockingMod {
         MinecraftForge.EVENT_BUS.addListener(Events::onBlockInteraction);
         MinecraftForge.EVENT_BUS.addListener(Events::onItemUse);
         MinecraftForge.EVENT_BUS.addListener(Events::registerCapabilitiesEvent);
+        MinecraftForge.EVENT_BUS.addListener(Events::onPlayerCloned);
         MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, Events::attachTreeCapabilityEvent);
         MinecraftForge.EVENT_BUS.addListener(Events::onPlayerAttack);
         MinecraftForge.EVENT_BUS.addListener(Events::onEntityDeath);

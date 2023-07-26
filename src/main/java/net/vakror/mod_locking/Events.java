@@ -107,6 +107,16 @@ public class Events {
         }));
     }
 
+    public static void onPlayerCloned(PlayerEvent.Clone event) {
+        if (event.isWasDeath()) {
+            event.getOriginal().getCapability(ModTreeProvider.MOD_TREE).ifPresent(oldStore -> {
+                event.getOriginal().getCapability(ModTreeProvider.MOD_TREE).ifPresent(newStore -> {
+                    newStore.copyFrom(oldStore);
+                });
+            });
+        }
+    }
+
     public static void onCommandsRegister(RegisterCommandsEvent event) {
         new ModLockingCommands.ReloadModLocksCommand(event.getDispatcher());
         new ModLockingCommands.ReloadPlayerTreeCommand(event.getDispatcher());
