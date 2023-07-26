@@ -11,6 +11,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -22,7 +23,7 @@ import static net.vakror.mod_locking.mod.util.CodecUtils.*;
 public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
 
 
-    //TODO: Add optional particle and sound effects to be played when unlocked
+    //TODO: Add optional particle effects to be played when unlocked
     public static final Codec<FineGrainedModUnlock> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(FineGrainedModUnlock::getName),
             POINT_MAP_CODEC.fieldOf("cost").forGetter(FineGrainedModUnlock::getCost),
@@ -33,6 +34,7 @@ public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
             CompoundTag.CODEC.optionalFieldOf("iconNbt").forGetter(FineGrainedModUnlock::getOptionalIconNbt),
             Codec.STRING.fieldOf("description").forGetter(FineGrainedModUnlock::getDescription),
             Codec.STRING.fieldOf("treeName").forGetter(FineGrainedModUnlock::getTreeName),
+            SoundEvent.DIRECT_CODEC.optionalFieldOf("unlockSound").forGetter(FineGrainedModUnlock::getSound),
             TYPE_MAP_CODEC.optionalFieldOf("itemRestrictions").forGetter(FineGrainedModUnlock::getItemRestrictionsOptional),
             TYPE_MAP_CODEC.optionalFieldOf("blockRestrictions").forGetter(FineGrainedModUnlock::getBlockRestrictionsOptional),
             TYPE_MAP_CODEC.optionalFieldOf("entityRestrictions").forGetter(FineGrainedModUnlock::getEntityRestrictionsOptional)
@@ -54,6 +56,18 @@ public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
         super(name, cost, getRequiredUnlocks(requiredUnlocks), x, y);
         this.withIcon(icon);
         iconNbt.ifPresent(this::withIconNbt);
+        this.withDescription(Component.literal(description));
+        this.withTree(treeName);
+        itemRestrictions.ifPresent(this::withItemRestrictionsMap);
+        blockRestrictions.ifPresent(this::withBlockRestrictionsMap);
+        entityRestrictions.ifPresent(this::withEntityRestrictionsMap);
+    }
+
+    public FineGrainedModUnlock(String name, Map<String, Integer> cost, Optional<List<String>> requiredUnlocks, float x, float y, String icon, Optional<CompoundTag> iconNbt, String description, String treeName, Optional<SoundEvent> unlockSound, Optional<Map<String, Restriction>> itemRestrictions, Optional<Map<String, Restriction>> blockRestrictions, Optional<Map<String, Restriction>> entityRestrictions) {
+        super(name, cost, getRequiredUnlocks(requiredUnlocks), x, y);
+        this.withIcon(icon);
+        iconNbt.ifPresent(this::withIconNbt);
+        unlockSound.ifPresent(this::withUnlockSound);
         this.withDescription(Component.literal(description));
         this.withTree(treeName);
         itemRestrictions.ifPresent(this::withItemRestrictionsMap);

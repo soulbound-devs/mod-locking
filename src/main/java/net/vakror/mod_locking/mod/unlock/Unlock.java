@@ -3,6 +3,7 @@ package net.vakror.mod_locking.mod.unlock;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -28,6 +29,7 @@ public class Unlock<T extends Unlock> implements ConfigObject {
     protected String description = "sample description";
     protected String icon;
     protected String treeName;
+    protected SoundEvent unlockSound;
 
     protected CompoundTag iconNbt;
 
@@ -130,6 +132,11 @@ public class Unlock<T extends Unlock> implements ConfigObject {
             return Optional.empty();
         }
         return Optional.of(iconNbt);
+    }
+
+    public T withUnlockSound(SoundEvent unlockSound) {
+        this.unlockSound = unlockSound;
+        return (T) this;
     }
 
     public String[] getRequiredUnlocks() {
@@ -331,6 +338,13 @@ public class Unlock<T extends Unlock> implements ConfigObject {
     public Unlock setCost(Map<String, Integer> cost) {
         this.cost = cost;
         return this;
+    }
+
+    public Optional<SoundEvent> getSound() {
+        if (unlockSound == null) {
+            return Optional.empty();
+        }
+        return Optional.of(unlockSound);
     }
 }
 

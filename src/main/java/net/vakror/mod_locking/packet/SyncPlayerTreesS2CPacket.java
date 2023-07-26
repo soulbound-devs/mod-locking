@@ -4,9 +4,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.network.NetworkEvent;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
+import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.tree.ModTree;
+import net.vakror.mod_locking.mod.unlock.Unlock;
 import net.vakror.mod_locking.mod.util.CodecUtils;
 import net.vakror.mod_locking.screen.ModUnlockingScreen;
 
@@ -18,9 +21,13 @@ import java.util.function.Supplier;
 
 public class SyncPlayerTreesS2CPacket {
     private final List<ModTree> playerTrees;
+    private final boolean reasonUnlocked;
+    private final String unlockName;
 
-    public SyncPlayerTreesS2CPacket(List<ModTree> playerTrees) {
+    public SyncPlayerTreesS2CPacket(List<ModTree> playerTrees, boolean reasonUnlocked, String unlockName) {
         this.playerTrees = playerTrees;
+        this.reasonUnlocked = reasonUnlocked;
+        this.unlockName = unlockName;
     }
 
     public SyncPlayerTreesS2CPacket(FriendlyByteBuf buf) {
@@ -29,6 +36,8 @@ public class SyncPlayerTreesS2CPacket {
         for (String key : treeTag.getAllKeys()) {
             playerTrees.add(ModTree.CODEC_WITH_MODS_UNLOCKED.parse(NbtOps.INSTANCE, treeTag.getCompound(key)).resultOrPartial((error) -> {throw new IllegalStateException(error);}).get());
         }
+        this.reasonUnlocked = buf.readBoolean();
+        this.unlockName = buf.readUtf();
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -39,6 +48,8 @@ public class SyncPlayerTreesS2CPacket {
         }
         nbt.put("trees", treeTag);
         buf.writeNbt(nbt);
+        buf.writeBoolean(reasonUnlocked);
+        buf.writeUtf(unlockName == null ? "": unlockName);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> sup) {
@@ -50,6 +61,13 @@ public class SyncPlayerTreesS2CPacket {
             }));
             if (Minecraft.getInstance().screen instanceof ModUnlockingScreen unlockingScreen) {
                 unlockingScreen.getMenu().setPlayerTrees(playerTrees);
+            }
+            if (reasonUnlocked) {
+                for (Unlock<?> unlock : ModConfigs.MOD_UNLOCKS.getAll()) {
+                    if (unlock.getName().equals(unlockName) && unlock.getSound().isPresent()) {
+                        Minecraft.getInstance().player.playSound(unlock.getSound().get(), 10,1);
+                    }
+                }
             }
         });
         return true;

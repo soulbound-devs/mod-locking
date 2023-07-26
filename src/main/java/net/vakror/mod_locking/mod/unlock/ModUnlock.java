@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -20,7 +21,7 @@ import static net.vakror.mod_locking.mod.util.CodecUtils.*;
 public class ModUnlock extends Unlock<ModUnlock> {
 
 
-    //TODO: Add optional particle and sound effects to be played when unlocked
+    //TODO: Add optional particle effects to be played when unlocked
     public static final Codec<ModUnlock> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(ModUnlock::getName),
             POINT_MAP_CODEC.fieldOf("cost").forGetter(ModUnlock::getCost),
@@ -33,6 +34,7 @@ public class ModUnlock extends Unlock<ModUnlock> {
             CompoundTag.CODEC.optionalFieldOf("iconNbt").forGetter(ModUnlock::getOptionalIconNbt),
             Codec.STRING.fieldOf("description").forGetter(ModUnlock::getDescription),
             Codec.STRING.fieldOf("treeName").forGetter(ModUnlock::getTreeName),
+            SoundEvent.DIRECT_CODEC.optionalFieldOf("unlockSound").forGetter(ModUnlock::getSound),
             TYPE_MAP_CODEC.optionalFieldOf("itemOverrides").forGetter(ModUnlock::getItemOverrides),
             TYPE_MAP_CODEC.optionalFieldOf("blockOverrides").forGetter(ModUnlock::getBlockOverrides),
             TYPE_MAP_CODEC.optionalFieldOf("entityOverrides").forGetter(ModUnlock::getEntityOverrides)
@@ -58,6 +60,21 @@ public class ModUnlock extends Unlock<ModUnlock> {
         super(name, costMap, getRequiredUnlocks(requiredUnlocks), x, y);
         this.withDescription(Component.literal(description));
         this.withIcon(icon);
+        this.withRestrictions(restrictions);
+        iconNbt.ifPresent(this::withIconNbt);
+        itemOverrides.ifPresent(this::withItemOverrideMap);
+        blockOverrides.ifPresent(this::withBlockOverrideMap);
+        entityOverrides.ifPresent(this::withEntityOverrideMap);
+        this.withTree(treeName);
+        Collections.addAll(this.modIds, modIds.toArray(new String[0]));
+    }
+
+    public ModUnlock(String name, Map<String, Integer> costMap, Optional<List<String>> requiredUnlocks, Restriction restrictions ,float x, float y, List<String> modIds, String icon, Optional<CompoundTag> iconNbt, String description, String treeName, Optional<SoundEvent> unlockSound, Optional<Map<String, Restriction>> itemOverrides, Optional<Map<String, Restriction>> blockOverrides, Optional<Map<String, Restriction>> entityOverrides) {
+        super(name, costMap, getRequiredUnlocks(requiredUnlocks), x, y);
+        this.withDescription(Component.literal(description));
+        this.withIcon(icon);
+        this.withRestrictions(restrictions);
+        unlockSound.ifPresent(this::withUnlockSound);
         iconNbt.ifPresent(this::withIconNbt);
         itemOverrides.ifPresent(this::withItemOverrideMap);
         blockOverrides.ifPresent(this::withBlockOverrideMap);
@@ -181,6 +198,11 @@ public class ModUnlock extends Unlock<ModUnlock> {
         this.restriction.set(Restriction.Type.BLOCK_INTERACTABILITY, canInteractWithBlock);
         this.restriction.set(Restriction.Type.USABILITY, canUseItem);
         this.restriction.set(Restriction.Type.CRAFTABILITY, canCraftItem);
+        return this;
+    }
+
+    public ModUnlock withRestrictions(Restriction restrictions) {
+        this.restriction = restrictions;
         return this;
     }
 

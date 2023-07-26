@@ -32,7 +32,7 @@ public class RequestPlayerTreesC2SPacket {
             context.getSender().getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
                 trees.set(modTreeCapability.getTrees());
             }));
-            ModPackets.sendToClient(new SyncPlayerTreesS2CPacket(trees.get()), context.getSender());
+            ModPackets.sendToClient(new SyncPlayerTreesS2CPacket(trees.get(), false, ""), context.getSender());
         });
         return true;
     }

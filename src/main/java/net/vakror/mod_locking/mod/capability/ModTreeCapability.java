@@ -3,6 +3,8 @@ package net.vakror.mod_locking.mod.capability;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
@@ -125,7 +127,7 @@ public class ModTreeCapability {
                 if (removePoints(unlock.getCost(), player)) {
                     if (tree.modsUnlocked == null) tree.modsUnlocked = new ArrayList<>();
                     tree.modsUnlocked.add(unlock.getName());
-                    ModPackets.sendToClient(new SyncPlayerTreesS2CPacket(getTrees()), player);
+                    ModPackets.sendToClient(new SyncPlayerTreesS2CPacket(getTrees(), true, unlock.getName()), player);
                 }
                 break;
             }

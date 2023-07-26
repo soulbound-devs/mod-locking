@@ -45,7 +45,7 @@ public class ModLockingCommands {
                 ServerPlayer player = context.getSource().getPlayerOrException();
                 if (player != null) {
                     player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).updateTrees();
-                    ModPackets.sendToClient(new SyncPlayerTreesS2CPacket(player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees()), player);
+                    ModPackets.sendToClient(new SyncPlayerTreesS2CPacket(player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees(), false, ""), player);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
