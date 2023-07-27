@@ -84,7 +84,7 @@ public class Events {
         }
         List<ModTree> unlockTrees = ModTrees.getUnlockTrees(player);
         unlockTrees.forEach((tree -> {
-            String restrictedBy = tree.restrictedBy((player.level().getBlockState(event.getPos())).getBlock(), Restriction.Type.BLOCK_INTERACTABILITY);
+            String restrictedBy = tree.restrictedBy((player.level.getBlockState(event.getPos())).getBlock(), Restriction.Type.BLOCK_INTERACTABILITY);
             if (restrictedBy != null) {
                 if (event.getSide() == LogicalSide.CLIENT) {
                     warnPlayerNeedsUnlock(restrictedBy, "interact_block");
@@ -132,7 +132,7 @@ public class Events {
         }
         List<ModTree> modTrees = ModTrees.getUnlockTrees(player);
         modTrees.forEach((modTree -> {
-            String restrictedBy = modTree.restrictedBy((player.level().getBlockState(event.getPos())).getBlock(), Restriction.Type.HITTABILITY);
+            String restrictedBy = modTree.restrictedBy((player.level.getBlockState(event.getPos())).getBlock(), Restriction.Type.HITTABILITY);
             if (restrictedBy != null) {
                 if (event.getLevel().isClientSide()) {
                     warnPlayerNeedsUnlock(restrictedBy, "hit");
@@ -192,7 +192,7 @@ public class Events {
         ModConfigs.KILL_ENTITY_POINT_OBTAIN_METHODS.killEntityObtainMethods.forEach((killEntityObtainMethod -> {
             if (event.getEntity().getType().equals(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(killEntityObtainMethod.entityId)))) {
                 if (event.getSource().getEntity() instanceof Player player) {
-                    player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> modTreeCapability.addPoint(killEntityObtainMethod.getPointType(), killEntityObtainMethod.getAmount(), (ServerPlayer) player)));
+                    player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> modTreeCapability.addPoint(killEntityObtainMethod.getPointType(), killEntityObtainMethod.getAmount(), (ServerPlayer) player, killEntityObtainMethod.getObtainSound().orElse(null))));
                 }
             }
         }));
@@ -210,7 +210,7 @@ public class Events {
         unlockTrees.forEach((unlockTree -> {
             String restrictedBy = unlockTree.restrictedBy((event.getEntity()).getType(), Restriction.Type.HITTABILITY);
             if (restrictedBy != null) {
-                if (player.level().isClientSide) {
+                if (player.level.isClientSide) {
                     warnPlayerNeedsUnlock(restrictedBy, "hit_entity");
                 }
                 event.setCanceled(true);
@@ -223,7 +223,7 @@ public class Events {
             Item item = itemStack.getItem();
             restrictedBy = unlockTree.restrictedBy(item, Restriction.Type.USABILITY);
             if (restrictedBy != null) {
-                if (player.level().isClientSide) {
+                if (player.level.isClientSide) {
                     warnPlayerNeedsUnlock(restrictedBy, "usage");
                 }
                 event.setCanceled(true);

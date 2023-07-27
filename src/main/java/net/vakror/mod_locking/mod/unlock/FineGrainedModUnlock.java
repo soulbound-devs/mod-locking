@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.advancements.FrameType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +35,8 @@ public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
             CompoundTag.CODEC.optionalFieldOf("iconNbt").forGetter(FineGrainedModUnlock::getOptionalIconNbt),
             Codec.STRING.fieldOf("description").forGetter(FineGrainedModUnlock::getDescription),
             Codec.STRING.fieldOf("treeName").forGetter(FineGrainedModUnlock::getTreeName),
-            SoundEvent.DIRECT_CODEC.optionalFieldOf("unlockSound").forGetter(FineGrainedModUnlock::getSound),
+            Codec.STRING.optionalFieldOf("frameType").forGetter(FineGrainedModUnlock::getFrameTypeName),
+            SoundEvent.CODEC.optionalFieldOf("unlockSound").forGetter(FineGrainedModUnlock::getSound),
             TYPE_MAP_CODEC.optionalFieldOf("itemRestrictions").forGetter(FineGrainedModUnlock::getItemRestrictionsOptional),
             TYPE_MAP_CODEC.optionalFieldOf("blockRestrictions").forGetter(FineGrainedModUnlock::getBlockRestrictionsOptional),
             TYPE_MAP_CODEC.optionalFieldOf("entityRestrictions").forGetter(FineGrainedModUnlock::getEntityRestrictionsOptional)
@@ -63,13 +65,14 @@ public class FineGrainedModUnlock extends Unlock<FineGrainedModUnlock> {
         entityRestrictions.ifPresent(this::withEntityRestrictionsMap);
     }
 
-    public FineGrainedModUnlock(String name, Map<String, Integer> cost, Optional<List<String>> requiredUnlocks, float x, float y, String icon, Optional<CompoundTag> iconNbt, String description, String treeName, Optional<SoundEvent> unlockSound, Optional<Map<String, Restriction>> itemRestrictions, Optional<Map<String, Restriction>> blockRestrictions, Optional<Map<String, Restriction>> entityRestrictions) {
+    public FineGrainedModUnlock(String name, Map<String, Integer> cost, Optional<List<String>> requiredUnlocks, float x, float y, String icon, Optional<CompoundTag> iconNbt, String description, String treeName, Optional<String> frameType, Optional<SoundEvent> unlockSound, Optional<Map<String, Restriction>> itemRestrictions, Optional<Map<String, Restriction>> blockRestrictions, Optional<Map<String, Restriction>> entityRestrictions) {
         super(name, cost, getRequiredUnlocks(requiredUnlocks), x, y);
         this.withIcon(icon);
         iconNbt.ifPresent(this::withIconNbt);
         unlockSound.ifPresent(this::withUnlockSound);
         this.withDescription(Component.literal(description));
         this.withTree(treeName);
+        frameType.ifPresent(this::withFrameType);
         itemRestrictions.ifPresent(this::withItemRestrictionsMap);
         blockRestrictions.ifPresent(this::withBlockRestrictionsMap);
         entityRestrictions.ifPresent(this::withEntityRestrictionsMap);

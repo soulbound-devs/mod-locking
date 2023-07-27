@@ -29,7 +29,7 @@ public class RequestPlayerPointsC2SPacket {
             context.getSender().getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
                 points.set(modTreeCapability.getPoints());
             }));
-            ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(points.get()), context.getSender());
+            ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(points.get(), null), context.getSender());
         });
         return true;
     }

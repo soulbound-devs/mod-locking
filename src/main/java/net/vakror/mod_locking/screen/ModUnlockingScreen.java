@@ -1,9 +1,13 @@
 package net.vakror.mod_locking.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.advancements.AdvancementTab;
 import net.minecraft.client.gui.screens.advancements.AdvancementTabType;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu> {
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTick, int pMouseX, int pMouseY) {
+    protected void renderBg(PoseStack stack, float partialTick, int pMouseX, int pMouseY) {
     }
 
 
@@ -89,16 +93,14 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         if (this.tabs.size() > AdvancementTabType.MAX_TABS) {
             int guiLeft = (this.width - 252) / 2;
             int guiTop = (this.height - 140) / 2;
-            addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.literal("<"), b -> tabPage = Math.max(tabPage - 1, 0       ))
-                    .pos(guiLeft, guiTop - 50).size(20, 20).build());
-            addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.literal(">"), b -> tabPage = Math.min(tabPage + 1, maxPages))
-                    .pos(guiLeft + WINDOW_WIDTH - 20, guiTop - 50).size(20, 20).build());
+            addRenderableWidget(new net.minecraft.client.gui.components.Button(guiLeft, guiTop - 50, 20, 20, Component.literal("<"), b -> tabPage = Math.max(tabPage - 1, 0       )));
+            addRenderableWidget(new net.minecraft.client.gui.components.Button(guiLeft + 252 - 20, guiTop - 50, 20, 20, Component.literal(">"), b -> tabPage = Math.min(tabPage + 1, maxPages)));
             maxPages = this.tabs.size() / AdvancementTabType.MAX_TABS;
         }
     }
 
     @Override
-    protected void renderLabels(GuiGraphics p_281635_, int p_282681_, int p_283686_) {
+    protected void renderLabels(PoseStack p_281635_, int p_282681_, int p_283686_) {
     }
 
     @Override
@@ -123,7 +125,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     }
 
     @Override
-    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void render(PoseStack graphics, int pMouseX, int pMouseY, float pPartialTick) {
         try {
             int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
             int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
@@ -133,7 +135,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
             if (maxPages != 0) {
                 net.minecraft.network.chat.Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
                 int width = this.font.width(page);
-                graphics.drawString(this.font, page.getVisualOrderText(), i + ((width - selectedTab.getMarginX() * 2) / 2) - (width / 2), j - 44, -1);
+                this.font.drawShadow(graphics, page.getVisualOrderText(), i + ((float) (width - selectedTab.getMarginX() * 2) / 2) - ((float) width / 2), j - 44, -1);
             }
             this.renderInside(graphics, pMouseX, pMouseY, i, j);
             this.renderWindow(graphics, i, j);
@@ -159,50 +161,66 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         }
     }
 
-    private void renderInside(GuiGraphics p_282012_, int p_97375_, int p_97376_, int p_97377_, int p_97378_) {
-        selectedTab.drawContents(p_282012_, p_97377_ + 9, p_97378_ + 18);
+    private void renderInside(PoseStack pPoseStack, int pMouseX, int pMouseY, int pOffsetX, int pOffsetY) {
+        PoseStack posestack = RenderSystem.getModelViewStack();
+        posestack.pushPose();
+        posestack.translate((double)(pOffsetX + 9), (double)(pOffsetY + 18), 0.0D);
+        RenderSystem.applyModelViewMatrix();
+        selectedTab.drawContents(pPoseStack);
+        posestack.popPose();
+        RenderSystem.applyModelViewMatrix();
+        RenderSystem.depthFunc(515);
+        RenderSystem.disableDepthTest();
     }
 
-    public void renderWindow(GuiGraphics graphics, int x, int y) {
+    public void renderWindow(PoseStack matrices, int x, int y) {
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
-//        p_283395_.blit(WINDOW_LOCATION, p_281890_, p_282532_, 0, 0, 252, 140);
-        renderCorrect(graphics, x, y);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, WINDOW_LOCATION);
+        renderCorrect(matrices, x, y);
         if (this.tabs.size() > 1) {
-            for(ModTreeTab tab : this.tabs.values()) {
-                if (tab.getPage() == tabPage)
-                    tab.drawTab(graphics, x, y, tab == this.selectedTab);
+            RenderSystem.setShaderTexture(0, TABS_LOCATION);
+
+            for(ModTreeTab treeTab : this.tabs.values()) {
+                if (treeTab.getPage() == tabPage)
+                    treeTab.drawTab(matrices, x, y, treeTab == this.selectedTab);
             }
 
-            for(ModTreeTab tab : this.tabs.values()) {
-                if (tab.getPage() == tabPage)
-                    tab.drawIcon(graphics, x, y);
+            RenderSystem.defaultBlendFunc();
+
+            for(ModTreeTab treeTab1 : this.tabs.values()) {
+                if (treeTab1.getPage() == tabPage)
+                    treeTab1.drawIcon(x, y, this.itemRenderer);
             }
+
+            RenderSystem.disableBlend();
         }
 
-        graphics.drawString(this.font, TITLE, x + 8, y + 6, 4210752, false);
+        this.font.draw(matrices, TITLE, (float)(x + 8), (float)(y + 6), 4210752);
     }
 
-    private void renderTooltips(GuiGraphics graphics, int mouseX, int mouseY, int offsetX, int offsetY) {
+    private void renderTooltips(PoseStack matrices, int mouseX, int mouseY, int offsetX, int offsetY) {
         if (this.selectedTab != null) {
-            graphics.pose().pushPose();
-            graphics.pose().translate((float)(offsetX + 9), (float)(offsetY + 18), 400.0F);
+            matrices.pushPose();
+            matrices.translate((float)(offsetX + 9), (float)(offsetY + 18), 400.0F);
             RenderSystem.enableDepthTest();
-            this.selectedTab.drawTooltips(graphics, mouseX - offsetX - 9, mouseY - offsetY - 18, offsetX, offsetY);
+            this.selectedTab.drawTooltips(matrices, mouseX - offsetX - 9, mouseY - offsetY - 18, offsetX, offsetY);
             RenderSystem.disableDepthTest();
-            graphics.pose().popPose();
+            matrices.popPose();
         }
 
         if (this.tabs.size() > 1) {
             for(ModTreeTab tab : this.tabs.values()) {
                 if (tab.getPage() == tabPage && tab.isMouseOver(offsetX, offsetY, (double)mouseX, (double)mouseY)) {
-                    graphics.renderTooltip(this.font, tab.getTitle(), mouseX, mouseY);
+                    this.renderTooltip(matrices, tab.getTitle(), mouseX, mouseY);
                 }
             }
         }
 
     }
 
-    public void renderCorrect(GuiGraphics graphics, int x, int y) {
+    public void renderCorrect(PoseStack matrices, int x, int y) {
         int iw = 0;
 
         int screenW = 252;
@@ -227,19 +245,21 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         int rightQuadX = width - selectedTab.getMarginX() - halfW - iw + clipXh;
         int bottomQuadY = height - selectedTab.getMarginY() - halfH + clipYh;
 
-        graphics.blit(WINDOW_LOCATION, x, y, 0, 0, halfW - clipXl, halfH - clipYl);
-        graphics.blit(WINDOW_LOCATION, rightQuadX, y, halfW + clipXh, 0, halfW - clipXh, halfH - clipYl); // top right
-        graphics.blit(WINDOW_LOCATION, x, bottomQuadY, 0, halfH + clipYh, halfW - clipXl, halfH - clipYh); // bottom left
-        graphics.blit(WINDOW_LOCATION, rightQuadX, bottomQuadY, halfW + clipXh, halfH + clipYh, halfW - clipXh, halfH - clipYh); // bottom right
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, WINDOW_LOCATION);
+        blit(matrices, x, y, 0, 0, halfW - clipXl, halfH - clipYl);
+        blit(matrices, rightQuadX, y, halfW + clipXh, 0, halfW - clipXh, halfH - clipYl); // top right
+        blit(matrices, x, bottomQuadY, 0, halfH + clipYh, halfW - clipXl, halfH - clipYh); // bottom left
+        blit(matrices, rightQuadX, bottomQuadY, halfW + clipXh, halfH + clipYh, halfW - clipXh, halfH - clipYh); // bottom right
 
         // draw borders
         iterate(x + halfW - clipXl, rightQuadX, 200, (pos, len) -> {
-            graphics.blit(WINDOW_LOCATION, pos, y, 15, 0, len, halfH); // top
-            graphics.blit(WINDOW_LOCATION, pos, bottomQuadY, 15, halfH + clipYh, len, halfH - clipYh); // bottom
+            blit(matrices, pos, y, 15, 0, len, halfH); // top
+            blit(matrices, pos, bottomQuadY, 15, halfH + clipYh, len, halfH - clipYh); // bottom
         });
         iterate(y + halfH - clipYl, bottomQuadY, 100, (pos, len) -> {
-            graphics.blit(WINDOW_LOCATION, x, pos, 0, 25, halfW, len); // left
-            graphics.blit(WINDOW_LOCATION, rightQuadX, pos, halfW + clipXh, 25, halfW - clipXh, len); // right
+            blit(matrices, x, pos, 0, 25, halfW, len); // left
+            blit(matrices, rightQuadX, pos, halfW + clipXh, 25, halfW - clipXh, len); // right
         });
     }
 

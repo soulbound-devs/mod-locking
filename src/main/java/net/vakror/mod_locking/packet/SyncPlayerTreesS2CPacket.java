@@ -65,7 +65,7 @@ public class SyncPlayerTreesS2CPacket {
             if (reasonUnlocked) {
                 for (Unlock<?> unlock : ModConfigs.MOD_UNLOCKS.getAll()) {
                     if (unlock.getName().equals(unlockName) && unlock.getSound().isPresent()) {
-                        Minecraft.getInstance().player.playSound(unlock.getSound().get(), 10,1);
+                        Minecraft.getInstance().player.playSound(unlock.getSound().get(), 15,1);
                     }
                 }
             }

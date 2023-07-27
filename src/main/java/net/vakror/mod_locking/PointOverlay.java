@@ -2,6 +2,7 @@ package net.vakror.mod_locking;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
@@ -10,7 +11,7 @@ import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.point.ModPoint;
 
 public class PointOverlay {
-    public static final IGuiOverlay POINT_HUD = ((gui, graphics, partialTick, width, height) -> {
+    public static final IGuiOverlay POINT_HUD = ((gui, matrices, partialTick, width, height) -> {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
@@ -21,7 +22,7 @@ public class PointOverlay {
                 int amount = Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints().get(point.name);
                 String nameString = amount + " " + (amount > 1 ? point.pluralName : point.name);
                 int nameWidth = Minecraft.getInstance().font.width(nameString);
-                graphics.drawString(Minecraft.getInstance().font, nameString, width - nameWidth - 10, (12 * i) - 6, point.getColor(), false);
+                GuiComponent.drawString(matrices, Minecraft.getInstance().font, nameString, width - nameWidth - 10, (12 * i) - 6, point.getColor());
                 i++;
             }
         }

@@ -1,10 +1,12 @@
 package net.vakror.mod_locking.mod.unlock;
 
+import net.minecraft.advancements.FrameType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.HorseArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.vakror.mod_locking.Tooltip;
@@ -30,6 +32,7 @@ public class Unlock<T extends Unlock> implements ConfigObject {
     protected String icon;
     protected String treeName;
     protected SoundEvent unlockSound;
+    protected String frameType;
 
     protected CompoundTag iconNbt;
 
@@ -288,6 +291,16 @@ public class Unlock<T extends Unlock> implements ConfigObject {
         return canAfford.get();
     }
 
+    public T withFrameType(String frameType) {
+        this.frameType = frameType;
+        return (T) this;
+    }
+
+    public T withFrameType(FrameType frameType) {
+        this.frameType = frameType.getName();
+        return (T) this;
+    }
+
     public List<Component> getReasonsWhyPlayerCannotAfford(ModUnlockingScreen screen) {
         List<Component> reasonsWhyPlayerCannotAfford = new ArrayList<>(1 + requiredUnlocks.length);
         AtomicBoolean canAfford = new AtomicBoolean(true);
@@ -345,6 +358,20 @@ public class Unlock<T extends Unlock> implements ConfigObject {
             return Optional.empty();
         }
         return Optional.of(unlockSound);
+    }
+
+    public Optional<String> getFrameTypeName() {
+        if (frameType == null || frameType.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(frameType);
+    }
+
+    public FrameType getFrameType() {
+        if (frameType == null) {
+            return FrameType.CHALLENGE;
+        }
+        return FrameType.byName(frameType);
     }
 }
 

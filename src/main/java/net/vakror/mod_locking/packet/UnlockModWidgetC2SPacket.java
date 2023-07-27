@@ -1,6 +1,8 @@
 package net.vakror.mod_locking.packet;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.NetworkEvent;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
@@ -44,7 +46,7 @@ public class UnlockModWidgetC2SPacket {
                                 points.set(modTreeCapability.getPoints());
                             }));
                         }));
-                        ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(points.get()), context.getSender());
+                        ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(points.get(), null), context.getSender());
                         ModPackets.sendToClient(new SyncModWidgetDescriptionsS2CPacket(), context.getSender());
                     }
 

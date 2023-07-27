@@ -1,13 +1,14 @@
 package net.vakror.mod_locking.screen.widget;
 
 import com.google.common.collect.Maps;
-import net.minecraft.advancements.Advancement;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.advancements.AdvancementTab;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.advancements.AdvancementTabType;
-import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
-import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -20,7 +21,7 @@ import net.vakror.mod_locking.screen.ModUnlockingScreen;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class ModTreeTab {
+public class ModTreeTab extends GuiComponent {
     private final Minecraft minecraft;
     private final ModUnlockingScreen screen;
     private final AdvancementTabType type;
@@ -105,15 +106,15 @@ public class ModTreeTab {
         return rootUnlocks;
     }
 
-    public void drawTab(GuiGraphics graphics, int offsetX, int offsetY, boolean isSelected) {
-        this.type.draw(graphics, offsetX, offsetY, isSelected, this.index);
+    public void drawTab(PoseStack graphics, int offsetX, int offsetY, boolean isSelected) {
+        this.type.draw(graphics, this, offsetX, offsetY, isSelected, this.index);
     }
 
-    public void drawIcon(GuiGraphics graphics, int offsetX, int offsetY) {
-        this.type.drawIcon(graphics, offsetX, offsetY, this.index, this.icon);
+    public void drawIcon(int offsetX, int offsetY, ItemRenderer renderer) {
+        this.type.drawIcon(offsetX, offsetY, this.index, renderer, this.icon);
     }
 
-    public void drawContents(GuiGraphics graphics, int x, int y) {
+    public void drawContents(PoseStack matrices) {
         if (!this.centered) {
             this.scrollX = tree.startScrollX;
             this.scrollY = tree.startScrollY;
@@ -123,36 +124,51 @@ public class ModTreeTab {
             this.centered = true;
         }
 
-        graphics.enableScissor(x, y, x + (screen.width - getMarginX() * 2 - 2 * 9), y + (screen.height - getMarginY() * 2 - 3 * 9));
-        graphics.pose().pushPose();
-        graphics.pose().translate((float) x, (float) y, 0.0F);
-        ResourceLocation resourcelocation = new ResourceLocation(this.tree.backgroundTexture);
+        matrices.pushPose();
+        matrices.translate(0.0D, 0.0D, 950.0D);
+        RenderSystem.enableDepthTest();
+        RenderSystem.colorMask(false, false, false, false);
+        fill(matrices, 4680, 2260, -4680, -2260, -16777216);
+        RenderSystem.colorMask(true, true, true, true);
+        matrices.translate(0.0D, 0.0D, -950.0D);
+        RenderSystem.depthFunc(518);
+        fill(matrices, (screen.width - tree.marginX * 2 - 2*9), (screen.height - tree.marginY * 2 - 3*9), 0, 0, -16777216);
+        RenderSystem.depthFunc(515);
+        ResourceLocation resourcelocation = new ResourceLocation(this.tree.getBackgroundTexture());
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, resourcelocation);
+
         int i = Mth.floor(this.scrollX);
         int j = Mth.floor(this.scrollY);
         int k = i % 16;
         int l = j % 16;
 
-        for (int i1 = -1; i1 <= ((screen.width - getMarginX() * 2) / 16 + 1); ++i1) {
-            for (int j1 = -1; j1 <= ((screen.height - getMarginY() * 2) / 16 + 1); ++j1) {
-                graphics.blit(resourcelocation, k + 16 * i1, l + 16 * j1, 0.0F, 0.0F, 16, 16, 16, 16);
+        for(int i1 = -1; i1 <= ((screen.width-tree.marginX * 2) / 16 + 1); ++i1) {
+            for(int j1 = -1; j1 <= ((screen.height-tree.marginY * 2) / 16 + 1); ++j1) {
+                blit(matrices, k + 16 * i1, l + 16 * j1, 0.0F, 0.0F, 16, 16, 16, 16);
             }
         }
 
         widgets.values().forEach((widget -> {
-            widget.drawConnectivity(graphics, i, j, true);
-            widget.drawConnectivity(graphics, i, j, false);
+            widget.drawConnectivity(matrices, i, j, true);
+            widget.drawConnectivity(matrices, i, j, false);
         }));
         for (ModWidget widget : widgets.values()) {
-            widget.draw(graphics, i, j);
+            widget.draw(matrices, i, j);
         }
-        graphics.pose().popPose();
-        graphics.disableScissor();
+        RenderSystem.depthFunc(518);
+        matrices.translate(0.0D, 0.0D, -950.0D);
+        RenderSystem.colorMask(false, false, false, false);
+        fill(matrices, 4680, 2260, -4680, -2260, -16777216);
+        RenderSystem.colorMask(true, true, true, true);
+        RenderSystem.depthFunc(515);
+        matrices.popPose();
     }
 
-    public void drawTooltips(GuiGraphics graphics, int mouseX, int mouseY, int width, int height) {
-        graphics.pose().pushPose();
-        graphics.pose().translate(0.0F, 0.0F, -200.0F);
-        graphics.fill(0, 0, (screen.width - getMarginX() * 2 - 2 * 9), (screen.height - getMarginY() * 2 - 3 * 9), Mth.floor(this.fade * 255.0F) << 24);
+    public void drawTooltips(PoseStack matrices, int mouseX, int mouseY, int width, int height) {
+        matrices.pushPose();
+        matrices.translate(0.0F, 0.0F, -200.0F);
+        fill(matrices, 0, 0, (screen.width - getMarginX() * 2 - 2 * 9), (screen.height - getMarginY() * 2 - 3 * 9), Mth.floor(this.fade * 255.0F) << 24);
         boolean flag = false;
         int i = Mth.floor(this.scrollX);
         int j = Mth.floor(this.scrollY);
@@ -160,13 +176,13 @@ public class ModTreeTab {
             for (ModWidget modWidget : this.widgets.values()) {
                 if (modWidget.isMouseOver(i, j, mouseX, mouseY)) {
                     flag = true;
-                    modWidget.drawHover(graphics, i, j, this.fade, width, height);
+                    modWidget.drawHover(matrices, i, j, this.fade, width, height);
                     break;
                 }
             }
         }
 
-        graphics.pose().popPose();
+        matrices.popPose();
         if (flag) {
             this.fade = Mth.clamp(this.fade + 0.02F, 0.0F, 0.3F);
         } else {

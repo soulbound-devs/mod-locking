@@ -3,6 +3,7 @@ package net.vakror.mod_locking.mod.unlock;
 import com.google.gson.annotations.Expose;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.advancements.FrameType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +35,8 @@ public class ModUnlock extends Unlock<ModUnlock> {
             CompoundTag.CODEC.optionalFieldOf("iconNbt").forGetter(ModUnlock::getOptionalIconNbt),
             Codec.STRING.fieldOf("description").forGetter(ModUnlock::getDescription),
             Codec.STRING.fieldOf("treeName").forGetter(ModUnlock::getTreeName),
-            SoundEvent.DIRECT_CODEC.optionalFieldOf("unlockSound").forGetter(ModUnlock::getSound),
+            Codec.STRING.optionalFieldOf("frameType").forGetter(ModUnlock::getFrameTypeName),
+            SoundEvent.CODEC.optionalFieldOf("unlockSound").forGetter(ModUnlock::getSound),
             TYPE_MAP_CODEC.optionalFieldOf("itemOverrides").forGetter(ModUnlock::getItemOverrides),
             TYPE_MAP_CODEC.optionalFieldOf("blockOverrides").forGetter(ModUnlock::getBlockOverrides),
             TYPE_MAP_CODEC.optionalFieldOf("entityOverrides").forGetter(ModUnlock::getEntityOverrides)
@@ -56,7 +58,7 @@ public class ModUnlock extends Unlock<ModUnlock> {
         Collections.addAll(this.modIds, modIds);
     }
 
-    public ModUnlock(String name, Map<String, Integer> costMap, Optional<List<String>> requiredUnlocks, Restriction restrictions ,float x, float y, List<String> modIds, String icon, Optional<CompoundTag> iconNbt, String description, String treeName, Optional<Map<String, Restriction>> itemOverrides, Optional<Map<String, Restriction>> blockOverrides, Optional<Map<String, Restriction>> entityOverrides) {
+    public ModUnlock(String name, Map<String, Integer> costMap, Optional<List<String>> requiredUnlocks, Restriction restrictions ,float x, float y, List<String> modIds, String icon, Optional<CompoundTag> iconNbt, String description, String treeName, Optional<String> frameType, Optional<Map<String, Restriction>> itemOverrides, Optional<Map<String, Restriction>> blockOverrides, Optional<Map<String, Restriction>> entityOverrides) {
         super(name, costMap, getRequiredUnlocks(requiredUnlocks), x, y);
         this.withDescription(Component.literal(description));
         this.withIcon(icon);
@@ -69,11 +71,12 @@ public class ModUnlock extends Unlock<ModUnlock> {
         Collections.addAll(this.modIds, modIds.toArray(new String[0]));
     }
 
-    public ModUnlock(String name, Map<String, Integer> costMap, Optional<List<String>> requiredUnlocks, Restriction restrictions ,float x, float y, List<String> modIds, String icon, Optional<CompoundTag> iconNbt, String description, String treeName, Optional<SoundEvent> unlockSound, Optional<Map<String, Restriction>> itemOverrides, Optional<Map<String, Restriction>> blockOverrides, Optional<Map<String, Restriction>> entityOverrides) {
+    public ModUnlock(String name, Map<String, Integer> costMap, Optional<List<String>> requiredUnlocks, Restriction restrictions ,float x, float y, List<String> modIds, String icon, Optional<CompoundTag> iconNbt, String description, String treeName, Optional<String> frameType, Optional<SoundEvent> unlockSound, Optional<Map<String, Restriction>> itemOverrides, Optional<Map<String, Restriction>> blockOverrides, Optional<Map<String, Restriction>> entityOverrides) {
         super(name, costMap, getRequiredUnlocks(requiredUnlocks), x, y);
         this.withDescription(Component.literal(description));
         this.withIcon(icon);
         this.withRestrictions(restrictions);
+        frameType.ifPresent(this::withFrameType);
         unlockSound.ifPresent(this::withUnlockSound);
         iconNbt.ifPresent(this::withIconNbt);
         itemOverrides.ifPresent(this::withItemOverrideMap);

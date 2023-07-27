@@ -103,7 +103,7 @@ public class ModTreeCapability {
             }
             if (this.points.containsKey(pointName)) {
                 this.addPoint(pointName, -pointAmount);
-                ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(getPoints()), player);
+                ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(getPoints(), null), player);
                 return true;
             } else {
                 return false;
@@ -112,13 +112,13 @@ public class ModTreeCapability {
         return false;
     }
 
-    public void addPoint(String point, int amount, ServerPlayer player) {
+    public void addPoint(String point, int amount, ServerPlayer player, SoundEvent soundEvent) {
         if (this.points.containsKey(point)) {
             this.points.put(point, this.points.get(point) + amount);
         } else {
             this.points.put(point, amount);
         }
-        ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(getPoints()), player);
+        ModPackets.sendToClient(new SyncPlayerPointsS2CPacket(getPoints(), soundEvent), player);
     }
 
     public void addUnlockedUnlock(Unlock<?> unlock, ServerPlayer player) {

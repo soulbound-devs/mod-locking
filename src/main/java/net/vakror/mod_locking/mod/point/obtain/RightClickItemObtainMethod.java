@@ -2,8 +2,11 @@ package net.vakror.mod_locking.mod.point.obtain;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.vakror.mod_locking.mod.util.CodecUtils;
+
+import java.util.Optional;
 
 public class RightClickItemObtainMethod extends PointObtainMethod {
 
@@ -12,17 +15,23 @@ public class RightClickItemObtainMethod extends PointObtainMethod {
             Codec.STRING.fieldOf("pointType").forGetter(RightClickItemObtainMethod::getPointType),
             Codec.STRING.fieldOf("item").forGetter(RightClickItemObtainMethod::getItem),
             Codec.STRING.fieldOf("type").forGetter((obtainMethod) -> getType()),
+            SoundEvent.CODEC.optionalFieldOf("obtainSound").forGetter(RightClickItemObtainMethod::getObtainSound),
             Codec.INT.fieldOf("amount").forGetter(RightClickItemObtainMethod::getAmount)
     ).apply(instance, RightClickItemObtainMethod::new));
     public String itemId;
 
     public RightClickItemObtainMethod(String item, int amount, String pointType) {
-        super(pointType + "_" + item + "_use_method", amount, pointType);
+        super(pointType + "_" + item, amount, pointType);
         this.itemId = item;
     }
 
-    public RightClickItemObtainMethod(String pointType, String item, String type, int amount) {
-        super(pointType + "_" + item + "_use_method", amount, pointType);
+    public RightClickItemObtainMethod(String pointType, String item, String type, Optional<SoundEvent> obtainSound, int amount) {
+        super(pointType + "_" + item, amount, pointType, obtainSound);
+        this.itemId = item;
+    }
+
+    public RightClickItemObtainMethod(String pointType, String item, String type, SoundEvent obtainSound, int amount) {
+        super(pointType + "_" + item, amount, pointType, obtainSound);
         this.itemId = item;
     }
 

@@ -1,11 +1,12 @@
 package net.vakror.mod_locking.screen.widget;
 
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.StringSplitter;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.advancements.AdvancementWidgetType;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class ModWidget {
+public class ModWidget extends GuiComponent {
     private static final ResourceLocation WIDGETS_LOCATION = new ResourceLocation("textures/gui/advancements/widgets.png");
     private static final int HEIGHT = 26;
     private static final int BOX_X = 0;
@@ -138,7 +139,7 @@ public class ModWidget {
         return parents.isEmpty() ? null : parents;
     }
 
-    public void drawConnectivity(GuiGraphics graphics, int x, int y, boolean shadow) {
+    public void drawConnectivity(PoseStack matrices, int x, int y, boolean shadow) {
         if (this.parents != null) {
             for (ModWidget parent : this.parents) {
                 int i = x + parent.x + 13;
@@ -148,33 +149,35 @@ public class ModWidget {
                 int i1 = y + this.y + 13;
                 int j1 = shadow ? -16777216 : -1;
                 if (shadow) {
-                    graphics.hLine(j, i, k - 1, j1);
-                    graphics.hLine(j + 1, i, k, j1);
-                    graphics.hLine(j, i, k + 1, j1);
-                    graphics.hLine(l, j - 1, i1 - 1, j1);
-                    graphics.hLine(l, j - 1, i1, j1);
-                    graphics.hLine(l, j - 1, i1 + 1, j1);
-                    graphics.vLine(j - 1, i1, k, j1);
-                    graphics.vLine(j + 1, i1, k, j1);
+                    this.hLine(matrices, j, i, k - 1, j1);
+                    this.hLine(matrices, j + 1, i, k, j1);
+                    this.hLine(matrices, j, i, k + 1, j1);
+                    this.hLine(matrices, l, j - 1, i1 - 1, j1);
+                    this.hLine(matrices, l, j - 1, i1, j1);
+                    this.hLine(matrices, l, j - 1, i1 + 1, j1);
+                    this.vLine(matrices, j - 1, i1, k, j1);
+                    this.vLine(matrices, j + 1, i1, k, j1);
                 } else {
-                    graphics.hLine(j, i, k, j1);
-                    graphics.hLine(l, j, i1, j1);
-                    graphics.vLine(j, i1, k, j1);
+                    this.hLine(matrices, j, i, k, j1);
+                    this.hLine(matrices, l, j, i1, j1);
+                    this.vLine(matrices, j, i1, k, j1);
                 }
             }
         }
     }
 
-    public void draw(GuiGraphics graphics, int x, int y) {
+    public void draw(PoseStack matrices, int x, int y) {
         AdvancementWidgetType widgetType = this.unlocked ? AdvancementWidgetType.OBTAINED: AdvancementWidgetType.UNOBTAINED;
 
-        graphics.blit(WIDGETS_LOCATION, x + this.x + 3, y + this.y, 26, 128 + widgetType.getIndex() * 26, 26, 26);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
+        this.blit(matrices, x + this.x + 3, y + this.y, unlock.getFrameType().getTexture(), 128 + widgetType.getIndex() * 26, 26, 26);
         ItemStack fakeUnlockStack = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon()))));
         CompoundTag tag = unlock.getIconNbt();
         if (tag != null) {
             fakeUnlockStack.setTag(tag);
         }
-        graphics.renderFakeItem(fakeUnlockStack, x + this.x + 8, y + this.y + 5);
+        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(fakeUnlockStack, x + this.x + 8, y + this.y + 5);
     }
 
     public int getWidth() {
@@ -189,68 +192,93 @@ public class ModWidget {
         return unlock;
     }
 
-    public void drawHover(GuiGraphics graphics, int x, int y, float fade, int width, int height) {
-        boolean flag = width + x + this.x + this.width + 26 >= this.tab.getScreen().width;
-        boolean flag1 = 113 - y - this.y - 26 <= 6 + this.description.size() * 9;
-        int j = this.width / 2;
+    public void drawHover(PoseStack pPoseStack, int pX, int pY, float pFade, int pWidth, int pHeight) {
+        boolean flag = pWidth + pX + this.x + this.width + 26 >= this.tab.getScreen().width;
+        boolean flag1 = 113 - pY - this.y - 26 <= 6 + this.description.size() * 9;
+        float f = this.unlocked ? 1: 0;
+        int j = Mth.floor(f * (float)this.width);
         AdvancementWidgetType advancementwidgettype;
         AdvancementWidgetType advancementwidgettype1;
         AdvancementWidgetType advancementwidgettype2;
         if (unlocked) {
+            j = this.width / 2;
             advancementwidgettype = AdvancementWidgetType.OBTAINED;
             advancementwidgettype1 = AdvancementWidgetType.OBTAINED;
             advancementwidgettype2 = AdvancementWidgetType.OBTAINED;
         } else {
+            j = this.width / 2;
             advancementwidgettype = AdvancementWidgetType.UNOBTAINED;
             advancementwidgettype1 = AdvancementWidgetType.UNOBTAINED;
             advancementwidgettype2 = AdvancementWidgetType.UNOBTAINED;
         }
 
         int k = this.width - j;
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
-        int l = y + this.y;
+        int l = pY + this.y;
         int i1;
         if (flag) {
-            i1 = x + this.x - this.width + 26 + 6;
+            i1 = pX + this.x - this.width + 26 + 6;
         } else {
-            i1 = x + this.x;
+            i1 = pX + this.x;
         }
 
         int j1 = 32 + this.description.size() * 9;
         if (!this.description.isEmpty()) {
             if (flag1) {
-                graphics.blitNineSliced(WIDGETS_LOCATION, i1, l + 26 - j1, this.width, j1, 10, 200, 26, 0, 52);
+                this.render9Sprite(pPoseStack, i1, l + 26 - j1, this.width, j1, 10, 200, 26, 0, 52);
             } else {
-                graphics.blitNineSliced(WIDGETS_LOCATION, i1, l, this.width, j1, 10, 200, 26, 0, 52);
+                this.render9Sprite(pPoseStack, i1, l, this.width, j1, 10, 200, 26, 0, 52);
             }
         }
 
-        graphics.blit(WIDGETS_LOCATION, i1, l, 0, advancementwidgettype.getIndex() * 26, j, 26);
-        graphics.blit(WIDGETS_LOCATION, i1 + j, l, 200 - k, advancementwidgettype1.getIndex() * 26, k, 26);
-        graphics.blit(WIDGETS_LOCATION, x + this.x + 3, y + this.y, 26, 128 + advancementwidgettype2.getIndex() * 26, 26, 26);
+        this.blit(pPoseStack, i1, l, 0, advancementwidgettype.getIndex() * 26, j, 26);
+        this.blit(pPoseStack, i1 + j, l, 200 - k, advancementwidgettype1.getIndex() * 26, k, 26);
+        this.blit(pPoseStack, pX + this.x + 3, pY + this.y, this.unlock.getFrameType().getTexture(), 128 + advancementwidgettype2.getIndex() * 26, 26, 26);
         if (flag) {
-            graphics.drawString(this.minecraft.font, this.title, i1 + 5, y + this.y + 9, -1);
+            this.minecraft.font.drawShadow(pPoseStack, this.title, (float)(i1 + 5), (float)(pY + this.y + 9), -1);
         } else {
-            graphics.drawString(this.minecraft.font, this.title, x + this.x + 32, y + this.y + 9, -1);
+            this.minecraft.font.drawShadow(pPoseStack, this.title, (float)(pX + this.x + 32), (float)(pY + this.y + 9), -1);
         }
 
         if (flag1) {
             for(int k1 = 0; k1 < this.description.size(); ++k1) {
-                graphics.drawString(this.minecraft.font, this.description.get(k1), i1 + 5, l + 26 - j1 + 7 + k1 * 9, -5592406, false);
+                this.minecraft.font.draw(pPoseStack, this.description.get(k1), (float)(i1 + 5), (float)(l + 26 - j1 + 7 + k1 * 9), -5592406);
             }
         } else {
             for(int l1 = 0; l1 < this.description.size(); ++l1) {
-                graphics.drawString(this.minecraft.font, this.description.get(l1), i1 + 5, y + this.y + 9 + 17 + l1 * 9, -5592406, false);
+                this.minecraft.font.draw(pPoseStack, this.description.get(l1), (float)(i1 + 5), (float)(pY + this.y + 9 + 17 + l1 * 9), -5592406);
             }
         }
 
-        ItemStack fakeUnlockStack = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon()))));
-        CompoundTag tag = unlock.getIconNbt();
-        if (tag != null) {
-            fakeUnlockStack.setTag(tag);
-        }
+        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon()))), pX + this.x + 8, pY + this.y + 5);
+    }
 
-        graphics.renderFakeItem(fakeUnlockStack, x + this.x + 8, y + this.y + 5);
+    protected void render9Sprite(PoseStack pPoseStack, int pX, int pY, int pWidth, int pHeight, int pPadding, int pUWidth, int pVHeight, int pUOffset, int pVOffset) {
+        this.blit(pPoseStack, pX, pY, pUOffset, pVOffset, pPadding, pPadding);
+        this.renderRepeating(pPoseStack, pX + pPadding, pY, pWidth - pPadding - pPadding, pPadding, pUOffset + pPadding, pVOffset, pUWidth - pPadding - pPadding, pVHeight);
+        this.blit(pPoseStack, pX + pWidth - pPadding, pY, pUOffset + pUWidth - pPadding, pVOffset, pPadding, pPadding);
+        this.blit(pPoseStack, pX, pY + pHeight - pPadding, pUOffset, pVOffset + pVHeight - pPadding, pPadding, pPadding);
+        this.renderRepeating(pPoseStack, pX + pPadding, pY + pHeight - pPadding, pWidth - pPadding - pPadding, pPadding, pUOffset + pPadding, pVOffset + pVHeight - pPadding, pUWidth - pPadding - pPadding, pVHeight);
+        this.blit(pPoseStack, pX + pWidth - pPadding, pY + pHeight - pPadding, pUOffset + pUWidth - pPadding, pVOffset + pVHeight - pPadding, pPadding, pPadding);
+        this.renderRepeating(pPoseStack, pX, pY + pPadding, pPadding, pHeight - pPadding - pPadding, pUOffset, pVOffset + pPadding, pUWidth, pVHeight - pPadding - pPadding);
+        this.renderRepeating(pPoseStack, pX + pPadding, pY + pPadding, pWidth - pPadding - pPadding, pHeight - pPadding - pPadding, pUOffset + pPadding, pVOffset + pPadding, pUWidth - pPadding - pPadding, pVHeight - pPadding - pPadding);
+        this.renderRepeating(pPoseStack, pX + pWidth - pPadding, pY + pPadding, pPadding, pHeight - pPadding - pPadding, pUOffset + pUWidth - pPadding, pVOffset + pPadding, pUWidth, pVHeight - pPadding - pPadding);
+    }
+
+    protected void renderRepeating(PoseStack pPoseStack, int pX, int pY, int pBorderToU, int pBorderToV, int pUOffset, int pVOffset, int pUWidth, int pVHeight) {
+        for(int i = 0; i < pBorderToU; i += pUWidth) {
+            int j = pX + i;
+            int k = Math.min(pUWidth, pBorderToU - i);
+
+            for(int l = 0; l < pBorderToV; l += pVHeight) {
+                int i1 = pY + l;
+                int j1 = Math.min(pVHeight, pBorderToV - l);
+                this.blit(pPoseStack, j, i1, pUOffset, pVOffset, k, j1);
+            }
+        }
     }
 
     public void mouseClicked() {
