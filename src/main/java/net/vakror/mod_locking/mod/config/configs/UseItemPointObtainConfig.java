@@ -10,11 +10,9 @@ import net.vakror.mod_locking.mod.point.obtain.RightClickItemObtainMethod;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModPointObtainConfig extends Config {
+public class UseItemPointObtainConfig extends Config<RightClickItemObtainMethod> {
     @Expose
     public List<RightClickItemObtainMethod> useItemObtainMethods = new ArrayList<>();
-    @Expose
-    public List<KillEntityObtainMethod> killEntityObtainMethods = new ArrayList<>();
 
     public List<PointObtainMethod> getAll() {
         List<PointObtainMethod> allMethods = new ArrayList<>();
