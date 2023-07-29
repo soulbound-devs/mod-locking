@@ -22,7 +22,19 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu> {
 
     @Override
-    protected void renderBg(PoseStack stack, float partialTick, int pMouseX, int pMouseY) {
+    protected void renderBg(PoseStack matrices, float partialTick, int pMouseX, int pMouseY) {
+        int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
+        int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
+        this.currentMouseXPos = pMouseX;
+        this.currentMouseYPos = pMouseY;
+        this.renderBackground(matrices);
+        if (maxPages != 0) {
+            net.minecraft.network.chat.Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
+            int width = this.font.width(page);
+            this.font.drawShadow(matrices, page.getVisualOrderText(), i + ((float) (width - selectedTab.getMarginX() * 2) / 2) - ((float) width / 2), j - 44, -1);
+        }
+        this.renderInside(matrices, pMouseX, pMouseY, i, j);
+        this.renderWindow(matrices, i, j);
     }
 
 
@@ -100,10 +112,6 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     }
 
     @Override
-    protected void renderLabels(PoseStack p_281635_, int p_282681_, int p_283686_) {
-    }
-
-    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         if (mouseButton == 0) {
             assert selectedTab != null;
@@ -125,21 +133,13 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     }
 
     @Override
-    public void render(PoseStack graphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void render(PoseStack matrices, int pMouseX, int pMouseY, float pPartialTick) {
         try {
+            assert selectedTab != null;
             int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
             int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
-            this.currentMouseXPos = pMouseX;
-            this.currentMouseYPos = pMouseY;
-            this.renderBackground(graphics);
-            if (maxPages != 0) {
-                net.minecraft.network.chat.Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
-                int width = this.font.width(page);
-                this.font.drawShadow(graphics, page.getVisualOrderText(), i + ((float) (width - selectedTab.getMarginX() * 2) / 2) - ((float) width / 2), j - 44, -1);
-            }
-            this.renderInside(graphics, pMouseX, pMouseY, i, j);
-            this.renderWindow(graphics, i, j);
-            this.renderTooltips(graphics, pMouseX, pMouseY, i, j);
+            this.renderBg(matrices, pPartialTick, pMouseX, pMouseY);
+            this.renderTooltips(matrices, pMouseX, pMouseY, i, j);
         } catch (NullPointerException e) {
             throw new NullPointerException(exceptionMessage);
         }
@@ -204,9 +204,9 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         if (this.selectedTab != null) {
             matrices.pushPose();
             matrices.translate((float)(offsetX + 9), (float)(offsetY + 18), 400.0F);
-            RenderSystem.enableDepthTest();
+//            RenderSystem.enableDepthTest();
             this.selectedTab.drawTooltips(matrices, mouseX - offsetX - 9, mouseY - offsetY - 18, offsetX, offsetY);
-            RenderSystem.disableDepthTest();
+//            RenderSystem.disableDepthTest();
             matrices.popPose();
         }
 

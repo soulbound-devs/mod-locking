@@ -172,7 +172,7 @@ public class ModTreeTab extends GuiComponent {
         boolean flag = false;
         int i = Mth.floor(this.scrollX);
         int j = Mth.floor(this.scrollY);
-        if (mouseX > 0 && mouseX < (screen.width - getMarginX()* 2 - 2 * 9) && mouseY > 0 && mouseY < (screen.height - getMarginY() * 2 - 3 * 9)) {
+        if (mouseX > 0 && mouseX < (screen.width - getMarginX() * 2 - 2 * 9) && mouseY > 0 && mouseY < (screen.height - getMarginY() * 2 - 3 * 9)) {
             for (ModWidget modWidget : this.widgets.values()) {
                 if (modWidget.isMouseOver(i, j, mouseX, mouseY)) {
                     flag = true;
@@ -188,7 +188,6 @@ public class ModTreeTab extends GuiComponent {
         } else {
             this.fade = Mth.clamp(this.fade - 0.04F, 0.0F, 1.0F);
         }
-
     }
 
     public boolean isMouseOver(int p_97155_, int p_97156_, double p_97157_, double p_97158_) {

@@ -195,8 +195,7 @@ public class ModWidget extends GuiComponent {
     public void drawHover(PoseStack pPoseStack, int pX, int pY, float pFade, int pWidth, int pHeight) {
         boolean flag = pWidth + pX + this.x + this.width + 26 >= this.tab.getScreen().width;
         boolean flag1 = 113 - pY - this.y - 26 <= 6 + this.description.size() * 9;
-        float f = this.unlocked ? 1: 0;
-        int j = Mth.floor(f * (float)this.width);
+        int j;
         AdvancementWidgetType advancementwidgettype;
         AdvancementWidgetType advancementwidgettype1;
         AdvancementWidgetType advancementwidgettype2;
@@ -252,8 +251,16 @@ public class ModWidget extends GuiComponent {
                 this.minecraft.font.draw(pPoseStack, this.description.get(l1), (float)(i1 + 5), (float)(pY + this.y + 9 + 17 + l1 * 9), -5592406);
             }
         }
+        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon()))), pX + this.x + 17, pY + this.y + 53);
+    }
 
-        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon()))), pX + this.x + 8, pY + this.y + 5);
+    public void renderIcon(int pX, int pY) {
+        ItemStack fakeUnlockStack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon())));
+        CompoundTag tag = unlock.getIconNbt();
+        if (tag != null) {
+            fakeUnlockStack.setTag(tag);
+        }
+        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(fakeUnlockStack, pX + this.x + 8, pY + this.y + 5);
     }
 
     protected void render9Sprite(PoseStack pPoseStack, int pX, int pY, int pWidth, int pHeight, int pPadding, int pUWidth, int pVHeight, int pUOffset, int pVOffset) {
