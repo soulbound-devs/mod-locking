@@ -26,12 +26,6 @@ public class ModPackets {
 
         INSTANCE = net;
 
-        net.messageBuilder(OpenLockingScreenC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(OpenLockingScreenC2SPacket::new)
-                .encoder(OpenLockingScreenC2SPacket::encode)
-                .consumerNetworkThread(OpenLockingScreenC2SPacket::handle)
-                .add();
-
         net.messageBuilder(SyncAllDataS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncAllDataS2CPacket::new)
                 .encoder(SyncAllDataS2CPacket::encode)

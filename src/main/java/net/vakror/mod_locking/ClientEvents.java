@@ -6,7 +6,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
@@ -20,9 +19,9 @@ import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.tree.ModTrees;
 import net.vakror.mod_locking.packet.ModPackets;
-import net.vakror.mod_locking.packet.OpenLockingScreenC2SPacket;
 import net.vakror.mod_locking.screen.ModMenuTypes;
 import net.vakror.mod_locking.screen.ModUnlockingScreen;
+import net.vakror.mod_locking.screen.UnlockingUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,11 +36,6 @@ public class ClientEvents {
         }
 
         @SubscribeEvent
-        public static void clientSetup(FMLClientSetupEvent event) {
-            MenuScreens.register(ModMenuTypes.UNLOCK_TREE.get(), ModUnlockingScreen::new);
-        }
-
-        @SubscribeEvent
         public static void registerGuiOverlay(RegisterGuiOverlaysEvent event) {
             event.registerAboveAll("point", PointOverlay.POINT_HUD);
         }
@@ -52,7 +46,7 @@ public class ClientEvents {
         @SubscribeEvent
         public static void onKeyInput(InputEvent.Key event) {
             if(KeyBinding.LOCK_SREEN_KEY.consumeClick()) {
-                ModPackets.sendToServer(new OpenLockingScreenC2SPacket());
+                UnlockingUtils.openUnlockingGui();
             }
         }
 

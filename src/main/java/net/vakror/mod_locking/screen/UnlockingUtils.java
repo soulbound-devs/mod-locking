@@ -1,5 +1,6 @@
 package net.vakror.mod_locking.screen;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -10,20 +11,12 @@ import net.minecraftforge.network.NetworkHooks;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.packet.ModPackets;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 
 public class UnlockingUtils {
-    public static void openUnlockingGui(ServerPlayer player) {
-        NetworkHooks.openScreen(player, new MenuProvider() {
-            @Override
-            public @NotNull Component getDisplayName() {
-                return Component.translatable("gui.unlocks");
-            }
-
-            @Override
-            public @NotNull AbstractContainerMenu createMenu(int syncId, @NotNull Inventory inv, @NotNull Player player) {
-                return new ModUnlockingMenu(syncId, inv, ModConfigs.MOD_UNLOCKS.getAll(), ModConfigs.TREES.trees, player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints(), player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees());
-            }
-        });
+    public static void openUnlockingGui() {
+        Minecraft.getInstance().setScreen(new ModUnlockingScreen(Component.literal("Mod Unlocking")));
     }
 }

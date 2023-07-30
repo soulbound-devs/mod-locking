@@ -14,7 +14,6 @@ import net.vakror.mod_locking.mod.tree.ModTree;
 public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, ModLockingMod.MOD_ID);
 
-    public static RegistryObject<MenuType<ModUnlockingMenu>> UNLOCK_TREE = registerMenuType(ModUnlockingMenu::new, "mod_unlocking");
     private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(IContainerFactory<T> factory, String name) {
         return MENUS.register(name, () -> IForgeMenuType.create(factory));
     }

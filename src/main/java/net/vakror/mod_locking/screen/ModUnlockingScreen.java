@@ -2,15 +2,22 @@ package net.vakror.mod_locking.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementTab;
 import net.minecraft.client.gui.screens.advancements.AdvancementTabType;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.vakror.mod_locking.mod.capability.ModTreeCapability;
+import net.vakror.mod_locking.mod.capability.ModTreeProvider;
+import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 import net.vakror.mod_locking.screen.widget.ModTreeTab;
 import net.vakror.mod_locking.screen.widget.ModWidget;
@@ -19,36 +26,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu> {
-
-    @Override
-    protected void renderBg(PoseStack matrices, float partialTick, int pMouseX, int pMouseY) {
-        int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
-        int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
-        this.currentMouseXPos = pMouseX;
-        this.currentMouseYPos = pMouseY;
-        this.renderBackground(matrices);
-        if (maxPages != 0) {
-            net.minecraft.network.chat.Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
-            int width = this.font.width(page);
-            this.font.drawShadow(matrices, page.getVisualOrderText(), i + ((float) (width - selectedTab.getMarginX() * 2) / 2) - ((float) width / 2), j - 44, -1);
-        }
-        this.renderInside(matrices, pMouseX, pMouseY, i, j);
-        this.renderWindow(matrices, i, j);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
+public class ModUnlockingScreen extends Screen {
     private static final ResourceLocation WINDOW_LOCATION = new ResourceLocation("textures/gui/advancements/window.png");
     public static final ResourceLocation TABS_LOCATION = new ResourceLocation("textures/gui/advancements/tabs.png");
     public static final int WINDOW_WIDTH = 252;
@@ -66,7 +44,13 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     private static final Component VERY_SAD_LABEL = Component.translatable("advancements.sad_label");
     private static final Component NO_ADVANCEMENTS_LABEL = Component.translatable("advancements.empty");
     private static final Component TITLE = Component.literal("Mod Unlocking");
-    private final Map<List<ModWidget>, ModTreeTab> tabs = new LinkedHashMap<>(this.menu.trees.size());
+    private final Map<List<ModWidget>, ModTreeTab> tabs;
+
+    protected List<ModTree> trees;
+    protected Map<String, Integer> playerPoints;
+    protected List<ModTree> playerTrees;
+    protected Map<String, Integer> pointColors;
+    protected List<Unlock<?>> unlocks;
     @Nullable
     private ModTreeTab selectedTab;
     private boolean isScrolling;
@@ -76,8 +60,14 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     public int currentMouseXPos = 0;
     public int currentMouseYPos = 0;
 
-    public ModUnlockingScreen(ModUnlockingMenu menu, Inventory inv, Component title) {
-        super(menu, inv, title);
+    public ModUnlockingScreen(Component title) {
+        super(title);
+        this.trees = ModConfigs.TREES.trees;
+        this.playerPoints = Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints();
+        this.playerTrees = Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees();
+        this.pointColors = Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPointColors();
+        this.unlocks = ModConfigs.MOD_UNLOCKS.getAll();
+        tabs = new LinkedHashMap<>(trees.size());
     }
 
     @Override
@@ -85,9 +75,9 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
         super.init();
         this.tabs.clear();
 
-        List<Unlock<?>> roots = new ArrayList<>(this.menu.unlocks.size());
-        List<Unlock<?>> nonRoots = new ArrayList<>(this.menu.unlocks.size());
-        for (Unlock<?> unlock: this.menu.unlocks) {
+        List<Unlock<?>> roots = new ArrayList<>(this.unlocks.size());
+        List<Unlock<?>> nonRoots = new ArrayList<>(this.unlocks.size());
+        for (Unlock<?> unlock: this.unlocks) {
             if (unlock.getParents() == null || unlock.getRequiredUnlocks()[0].equals("")) {
                 roots.add(unlock);
             } else {
@@ -138,11 +128,26 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
             assert selectedTab != null;
             int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
             int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
-            this.renderBg(matrices, pPartialTick, pMouseX, pMouseY);
+            renderBackground(matrices, pPartialTick, pMouseX, pMouseY);
             this.renderTooltips(matrices, pMouseX, pMouseY, i, j);
         } catch (NullPointerException e) {
             throw new NullPointerException(exceptionMessage);
         }
+    }
+
+    public void renderBackground(PoseStack matrices, float partialTick, int mouseX, int mouseY) {
+        int i = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
+        int j = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
+        this.currentMouseXPos = mouseX;
+        this.currentMouseYPos = mouseY;
+        this.renderBackground(matrices);
+        if (maxPages != 0) {
+            net.minecraft.network.chat.Component page = Component.literal(String.format("%d / %d", tabPage + 1, maxPages + 1));
+            int width = this.font.width(page);
+            this.font.drawShadow(matrices, page.getVisualOrderText(), i + ((float) (width - selectedTab.getMarginX() * 2) / 2) - ((float) width / 2), j - 44, -1);
+        }
+        this.renderInside(matrices, mouseX, mouseY, i, j);
+        this.renderWindow(matrices, i, j);
     }
 
     @Override
@@ -277,10 +282,10 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     }
 
     public void onAddUnlockRoots(List<Unlock<?>> unlock, boolean a) {
-        for (int i = 0; i < this.menu.trees.size(); i++) {
+        for (int i = 0; i < this.trees.size(); i++) {
             List<Unlock<?>> unlocks = new ArrayList<>(unlock.size());
             for (Unlock<?> unlock1: unlock) {
-                if (unlock1.getTreeName().equals(this.menu.trees.get(i).name)) {
+                if (unlock1.getTreeName().equals(this.trees.get(i).name)) {
                     unlocks.add(unlock1);
                 }
             }
@@ -289,7 +294,7 @@ public class ModUnlockingScreen extends AbstractContainerScreen<ModUnlockingMenu
     }
 
     public void onAddUnlockRoots(List<Unlock<?>> unlock) {
-        ModTreeTab treeTab = ModTreeTab.create(this.minecraft, this, this.tabs.size(), this.menu.trees.get(this.tabs.size()));
+        ModTreeTab treeTab = ModTreeTab.create(this.minecraft, this, this.tabs.size(), this.trees.get(this.tabs.size()));
         List<ModWidget> root = new ArrayList<>(unlock.size());
         assert treeTab != null;
         for (Unlock<?> unlock1: unlock) {
