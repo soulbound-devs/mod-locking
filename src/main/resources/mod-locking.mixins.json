@@ -4,9 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "mod-locking.refmap.json",
   "mixins": [
-    "FixInvalidPacketSizeMixin",
     "ItemMixin",
-    "PlayMessagesMixin",
     "SlotMixin"
   ],
   "client": [
