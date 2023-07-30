@@ -257,7 +257,7 @@ public class ModWidget extends GuiComponent {
         if (itemNbt != null) {
             icon.setTag(itemNbt);
         }
-        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(icon, pX + this.x + 17, pY + this.y + 53);
+        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(icon, pX + this.x + 17 + tab.getMarginX(), pY + this.y + 23 + tab.getMarginY());
     }
 
     public void renderIcon(int pX, int pY) {
