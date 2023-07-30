@@ -176,7 +176,7 @@ public class Unlock<T extends Unlock> implements ConfigObject {
             list.add(new Tooltip.TooltipComponentBuilder().addPart("Cost: ").setStyle(Style.EMPTY.withBold(true)).build().getTooltip());
 
             getCost().forEach((name, amount) -> {
-                list.add(Component.literal(amount + " " + (amount > 1 ? ModPointsConfig.getPoint(name).pluralName : name)).setStyle(Style.EMPTY.withColor(screen.getMenu().getPointColors().get(name))));
+                list.add(Component.literal(amount + " " + (amount > 1 ? ModPointsConfig.getPoint(name).pluralName : name)).setStyle(Style.EMPTY.withColor(screen.getPointColors().get(name))));
             });
 
             list.add(Component.empty());
@@ -199,7 +199,7 @@ public class Unlock<T extends Unlock> implements ConfigObject {
 
     public boolean hasUnlocked(ModUnlockingScreen screen) {
         boolean unlocked = false;
-        for (ModTree tree : screen.getMenu().getPlayerTrees()) {
+        for (ModTree tree : screen.getPlayerTrees()) {
             if (tree.modsUnlocked.contains(name)) {
                 unlocked = true;
                 break;
@@ -211,7 +211,7 @@ public class Unlock<T extends Unlock> implements ConfigObject {
     public boolean canUnlock(ModUnlockingScreen screen) {
         AtomicBoolean canAfford = new AtomicBoolean(true);
         getCost().forEach((name, amount) -> {
-            if (screen.getMenu().getPlayerPoints().containsKey(name) && screen.getMenu().getPlayerPoints().get(name) >= amount) {
+            if (screen.getPlayerPoints().containsKey(name) && screen.getPlayerPoints().get(name) >= amount) {
                 if (canAfford.get()) {
                     canAfford.set(true);
                 }
@@ -221,7 +221,7 @@ public class Unlock<T extends Unlock> implements ConfigObject {
         });
 
         List<String> allModsUnlocked = new ArrayList<>();
-        for (ModTree tree : screen.getMenu().getPlayerTrees()) {
+        for (ModTree tree : screen.getPlayerTrees()) {
             allModsUnlocked.addAll(tree.modsUnlocked);
         }
         for (String requiredUnlock : requiredUnlocks) {
@@ -306,7 +306,7 @@ public class Unlock<T extends Unlock> implements ConfigObject {
         AtomicBoolean canAfford = new AtomicBoolean(true);
         Arrays.stream(this.requiredUnlocks).toList();
         getCost().forEach((name, amount) -> {
-            if (screen.getMenu().getPlayerPoints().containsKey(name) && screen.getMenu().getPlayerPoints().get(name) >= amount) {
+            if (screen.getPlayerPoints().containsKey(name) && screen.getPlayerPoints().get(name) >= amount) {
                 if (canAfford.get()) {
                     canAfford.set(true);
                 }
@@ -321,7 +321,7 @@ public class Unlock<T extends Unlock> implements ConfigObject {
         }
 
         List<String> allModsUnlocked = new ArrayList<>();
-        for (ModTree tree : screen.getMenu().getPlayerTrees()) {
+        for (ModTree tree : screen.getPlayerTrees()) {
             allModsUnlocked.addAll(tree.modsUnlocked);
         }
         for (String requiredUnlock : requiredUnlocks) {

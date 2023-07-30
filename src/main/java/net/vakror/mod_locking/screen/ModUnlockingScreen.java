@@ -14,6 +14,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
 import net.vakror.mod_locking.mod.config.ModConfigs;
@@ -348,6 +349,42 @@ public class ModUnlockingScreen extends Screen {
                 widget.description = widget.getUnlock().createDescription(this);
             }
         }
+    }
+
+    public Map<String, Integer> getPlayerPoints() {
+        return playerPoints;
+    }
+
+    public ModUnlockingScreen setPlayerPoints(Map<String, Integer> playerPoints) {
+        this.playerPoints = playerPoints;
+        return this;
+    }
+
+    public List<ModTree> getPlayerTrees() {
+        return playerTrees;
+    }
+
+    public ModUnlockingScreen setPlayerTrees(List<ModTree> playerTrees) {
+        this.playerTrees = playerTrees;
+        return this;
+    }
+
+    public Map<String, Integer> getPointColors() {
+        return pointColors;
+    }
+
+    public ModUnlockingScreen setPointColors(Map<String, Integer> pointColors) {
+        this.pointColors = pointColors;
+        return this;
+    }
+
+    public List<Unlock<?>> getUnlocks() {
+        return unlocks;
+    }
+
+    public ModUnlockingScreen setUnlocks(List<Unlock<?>> unlocks) {
+        this.unlocks = unlocks;
+        return this;
     }
 }
 
