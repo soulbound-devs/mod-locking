@@ -256,7 +256,7 @@ public class ModTreeTab extends GuiComponent {
     }
 
     public int getMarginX() {
-        return this.tree.marginX;
+        return Math.max(this.tree.marginX, 30);
     }
 
     public int getMarginY() {
