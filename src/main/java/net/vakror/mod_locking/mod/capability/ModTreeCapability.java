@@ -57,8 +57,8 @@ public class ModTreeCapability {
 
     public Map<String, Integer> getPointColors() {
         Map<String, Integer> colors = new HashMap<>(points.size());
-        points.forEach((name, amount) -> {
-            colors.put(name, ModPointsConfig.getPoint(name).getColor());
+        ModConfigs.POINTS.points.forEach((point) -> {
+            colors.put(point.name, point.getColor());
         });
         return colors;
     }
