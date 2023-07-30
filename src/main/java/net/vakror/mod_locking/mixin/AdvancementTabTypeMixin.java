@@ -12,8 +12,8 @@ public class AdvancementTabTypeMixin {
     @ModifyConstant(method = "getX", constant = @Constant(intValue = 248), require = 1)
     public int getAdjustedTabX(int orig) {
         assert Minecraft.getInstance().screen != null;
-        if (Minecraft.getInstance().screen instanceof ModUnlockingScreen) {
-            return Minecraft.getInstance().screen.width - 30 * 2 - 4;
+        if (Minecraft.getInstance().screen instanceof ModUnlockingScreen sc) {
+            return Minecraft.getInstance().screen.width - sc.getSelectedTab().getMarginX() * 2 - 4;
         } else {
             return 248;
         }
@@ -22,8 +22,8 @@ public class AdvancementTabTypeMixin {
     @ModifyConstant(method = "getY", constant = @Constant(intValue = 136), require = 1)
     public int getAdjustedTabY(int orig) {
         assert Minecraft.getInstance().screen != null;
-        if (Minecraft.getInstance().screen instanceof ModUnlockingScreen) {
-            return Minecraft.getInstance().screen.height - 30 * 2 - 4;
+        if (Minecraft.getInstance().screen instanceof ModUnlockingScreen sc) {
+            return Minecraft.getInstance().screen.height - sc.getSelectedTab().getMarginY() * 2 - 4;
         } else {
             return 136;
         }

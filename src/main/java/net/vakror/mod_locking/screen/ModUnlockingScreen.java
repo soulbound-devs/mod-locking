@@ -94,10 +94,10 @@ public class ModUnlockingScreen extends Screen {
             this.selectedTab = this.tabs.values().stream().toList().get(0);
         }
         if (this.tabs.size() > AdvancementTabType.MAX_TABS) {
-            int guiLeft = (this.width - 252) / 2;
-            int guiTop = (this.height - 140) / 2;
+            int guiLeft = (this.width - (width - selectedTab.getMarginX() * 2)) / 2;
+            int guiTop = (this.height - (height - selectedTab.getMarginY() * 2)) / 2;
             addRenderableWidget(new net.minecraft.client.gui.components.Button(guiLeft, guiTop - 50, 20, 20, Component.literal("<"), b -> tabPage = Math.max(tabPage - 1, 0       )));
-            addRenderableWidget(new net.minecraft.client.gui.components.Button(guiLeft + 252 - 20, guiTop - 50, 20, 20, Component.literal(">"), b -> tabPage = Math.min(tabPage + 1, maxPages)));
+            addRenderableWidget(new net.minecraft.client.gui.components.Button(guiLeft + (width - selectedTab.getMarginX() * 2) - 20, guiTop - 50, 20, 20, Component.literal(">"), b -> tabPage = Math.min(tabPage + 1, maxPages)));
             maxPages = this.tabs.size() / AdvancementTabType.MAX_TABS;
         }
     }
@@ -385,6 +385,10 @@ public class ModUnlockingScreen extends Screen {
     public ModUnlockingScreen setUnlocks(List<Unlock<?>> unlocks) {
         this.unlocks = unlocks;
         return this;
+    }
+
+    public ModTreeTab getSelectedTab() {
+        return selectedTab;
     }
 }
 

@@ -38,7 +38,7 @@ public class ModTreeTab extends GuiComponent {
     private float fade;
     private boolean centered;
     private int page;
-    private ModTree tree;
+    public ModTree tree;
     private List<ModWidget> rootUnlocks;
     private String name;
 
@@ -132,7 +132,7 @@ public class ModTreeTab extends GuiComponent {
         RenderSystem.colorMask(true, true, true, true);
         matrices.translate(0.0D, 0.0D, -950.0D);
         RenderSystem.depthFunc(518);
-        fill(matrices, (screen.width - tree.marginX * 2 - 2*9), (screen.height - tree.marginY * 2 - 3*9), 0, 0, -16777216);
+        fill(matrices, (screen.width - getMarginX() * 2 - 2*9), (screen.height - getMarginY() * 2 - 3*9), 0, 0, -16777216);
         RenderSystem.depthFunc(515);
         ResourceLocation resourcelocation = new ResourceLocation(this.tree.getBackgroundTexture());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -143,8 +143,8 @@ public class ModTreeTab extends GuiComponent {
         int k = i % 16;
         int l = j % 16;
 
-        for(int i1 = -1; i1 <= ((screen.width-tree.marginX * 2) / 16 + 1); ++i1) {
-            for(int j1 = -1; j1 <= ((screen.height-tree.marginY * 2) / 16 + 1); ++j1) {
+        for(int i1 = -1; i1 <= ((screen.width - getMarginX() * 2) / 16 + 1); ++i1) {
+            for(int j1 = -1; j1 <= ((screen.height- getMarginY() * 2) / 16 + 1); ++j1) {
                 blit(matrices, k + 16 * i1, l + 16 * j1, 0.0F, 0.0F, 16, 16, 16, 16);
             }
         }
@@ -209,11 +209,11 @@ public class ModTreeTab extends GuiComponent {
 
     public void scroll(double p_97152_, double p_97153_) {
         if (this.maxX - this.minX > (screen.width - getMarginX() * 2 - 2 * 9)) {
-            this.scrollX = Mth.clamp(this.scrollX + p_97152_, (double)(-(this.maxX - 234)), 0.0D);
+            this.scrollX = Mth.clamp(this.scrollX + p_97152_, -(this.maxX - (screen.width - getMarginX() * 2 - 2 * 9)), 0.0D);
         }
 
         if (this.maxY - this.minY > (screen.height - getMarginY() * 2)) {
-            this.scrollY = Mth.clamp(this.scrollY + p_97153_, (double)(-(this.maxY - 113)), 0.0D);
+            this.scrollY = Mth.clamp(this.scrollY + p_97153_, (double)(-(this.maxY - (screen.height - getMarginY() * 2 - 3*9))), 0.0D);
         }
     }
 
