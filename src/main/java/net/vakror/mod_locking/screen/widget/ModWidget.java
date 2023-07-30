@@ -251,7 +251,13 @@ public class ModWidget extends GuiComponent {
                 this.minecraft.font.draw(pPoseStack, this.description.get(l1), (float)(i1 + 5), (float)(pY + this.y + 9 + 17 + l1 * 9), -5592406);
             }
         }
-        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon()))), pX + this.x + 17, pY + this.y + 53);
+
+        ItemStack icon = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.unlock.getIcon())));
+        CompoundTag itemNbt = unlock.getIconNbt();
+        if (itemNbt != null) {
+            icon.setTag(itemNbt);
+        }
+        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(icon, pX + this.x + 17, pY + this.y + 53);
     }
 
     public void renderIcon(int pX, int pY) {
