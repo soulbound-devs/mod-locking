@@ -21,10 +21,18 @@ import java.util.function.Supplier;
 public class SyncPlayerPointsS2CPacket {
     private final Map<String, Integer> playerPoints;
     private final SoundEvent soundEvent;
+    private final boolean colors;
 
     public SyncPlayerPointsS2CPacket(Map<String, Integer> playerPoints, SoundEvent event) {
         this.playerPoints = playerPoints;
         this.soundEvent = event;
+        colors = false;
+    }
+
+    public SyncPlayerPointsS2CPacket(Map<String, Integer> playerPoints, SoundEvent event, boolean colors) {
+        this.playerPoints = playerPoints;
+        this.soundEvent = event;
+        this.colors = colors;
     }
 
     public SyncPlayerPointsS2CPacket(FriendlyByteBuf buf) {
@@ -36,6 +44,7 @@ public class SyncPlayerPointsS2CPacket {
         } else {
             soundEvent = null;
         }
+        colors = buf.readBoolean();
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -45,17 +54,20 @@ public class SyncPlayerPointsS2CPacket {
             nbt.put("soundEvent", SoundEvent.CODEC.encodeStart(NbtOps.INSTANCE, soundEvent).resultOrPartial((error) -> {}).get());
         }
         buf.writeNbt(nbt);
+        buf.writeBoolean(colors);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> sup) {
         NetworkEvent.Context context = sup.get();
         context.enqueueWork(() -> {
             assert Minecraft.getInstance().player != null;
-            Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
-                modTreeCapability.setPoints(playerPoints);
-            }));
-            if (Minecraft.getInstance().screen instanceof ModUnlockingScreen unlockingScreen) {
-                unlockingScreen.getMenu().setPlayerPoints(playerPoints);
+            if (!colors) {
+                Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
+                    modTreeCapability.setPoints(playerPoints);
+                }));
+                if (Minecraft.getInstance().screen instanceof ModUnlockingScreen unlockingScreen) {
+                    unlockingScreen.setPlayerPoints(playerPoints);
+                }
             }
             Minecraft.getInstance().player.playSound(soundEvent, 15, 1);
         });

@@ -60,7 +60,7 @@ public class SyncPlayerTreesS2CPacket {
                 modTreeCapability.setTrees(playerTrees);
             }));
             if (Minecraft.getInstance().screen instanceof ModUnlockingScreen unlockingScreen) {
-                unlockingScreen.getMenu().setPlayerTrees(playerTrees);
+                unlockingScreen.setPlayerTrees(playerTrees);
             }
             if (reasonUnlocked) {
                 for (Unlock<?> unlock : ModConfigs.MOD_UNLOCKS.getAll()) {

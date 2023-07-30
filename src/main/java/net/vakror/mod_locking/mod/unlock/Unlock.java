@@ -3,6 +3,7 @@ package net.vakror.mod_locking.mod.unlock;
 import net.minecraft.advancements.FrameType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
@@ -176,7 +177,11 @@ public class Unlock<T extends Unlock> implements ConfigObject {
             list.add(new Tooltip.TooltipComponentBuilder().addPart("Cost: ").setStyle(Style.EMPTY.withBold(true)).build().getTooltip());
 
             getCost().forEach((name, amount) -> {
-                list.add(Component.literal(amount + " " + (amount > 1 ? ModPointsConfig.getPoint(name).pluralName : name)).setStyle(Style.EMPTY.withColor(screen.getPointColors().get(name))));
+                MutableComponent component = Component.literal(amount + " " + (amount > 1 ? ModPointsConfig.getPoint(name).pluralName : name));
+                if (screen.getPointColors().get(name) != null) {
+                    component.setStyle(Style.EMPTY.withColor(screen.getPointColors().get(name)));
+                }
+                list.add(component);
             });
 
             list.add(Component.empty());
