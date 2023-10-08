@@ -24,7 +24,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.command.ConfigCommand;
 import net.vakror.mod_locking.command.ModLockingCommands;
 import net.vakror.mod_locking.locking.Restriction;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.KillEntityPointObtainConfig;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.tree.ModTrees;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
@@ -189,7 +189,7 @@ public class Events {
     }
 
     public static void onEntityDeath(LivingDeathEvent event) {
-        ModConfigs.KILL_ENTITY_POINT_OBTAIN_METHODS.killEntityObtainMethods.forEach((killEntityObtainMethod -> {
+        KillEntityPointObtainConfig.INSTANCE.killEntityObtainMethods.forEach((killEntityObtainMethod -> {
             if (event.getEntity().getType().equals(ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(killEntityObtainMethod.entityId)))) {
                 if (event.getSource().getEntity() instanceof Player player) {
                     player.getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> modTreeCapability.addPoint(killEntityObtainMethod.getPointType(), killEntityObtainMethod.getAmount(), (ServerPlayer) player, killEntityObtainMethod.getObtainSound().orElse(null))));

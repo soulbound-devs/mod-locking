@@ -1,11 +1,10 @@
 package net.vakror.mod_locking.mod.point.obtain;
 
 import net.minecraft.sounds.SoundEvent;
-import net.vakror.mod_locking.mod.config.ConfigObject;
 
 import java.util.Optional;
 
-public abstract class PointObtainMethod implements ConfigObject {
+public abstract class PointObtainMethod {
     private int amount = 1;
     private final String pointType;
     private final String name;
@@ -44,10 +43,7 @@ public abstract class PointObtainMethod implements ConfigObject {
         return name;
     }
 
-    @Override
-    public String getFileName() {
-        return name;
-    }
+
 
     public Optional<SoundEvent> getObtainSound() {
         if (obtainSound == null) {

@@ -7,21 +7,19 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.HorseArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.vakror.mod_locking.Tooltip;
 import net.vakror.mod_locking.locking.Restriction;
-import net.vakror.mod_locking.mod.config.ConfigObject;
-import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
+import net.vakror.mod_locking.mod.config.configs.ModUnlocksConfig;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.screen.ModUnlockingScreen;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Unlock<T extends Unlock> implements ConfigObject {
+public class Unlock<T extends Unlock<T>> {
     protected String name;
     protected Map<String, Integer> cost;
 
@@ -110,7 +108,7 @@ public class Unlock<T extends Unlock> implements ConfigObject {
 
         List<Unlock<?>> unlocks = new ArrayList<>();
 
-        for (Unlock<?> unlock: ModConfigs.MOD_UNLOCKS.getAll()) {
+        for (Unlock<?> unlock: ModUnlocksConfig.INSTANCE.getAll()) {
             for (String requiredUnlock: this.requiredUnlocks) {
                 if (unlock.getName().equals(requiredUnlock)) {
                     unlocks.add(unlock);

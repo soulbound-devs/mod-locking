@@ -3,7 +3,6 @@ package net.vakror.mod_locking.packet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
-import net.vakror.mod_locking.mod.config.ModConfigs;
 
 import java.util.HashMap;
 import java.util.Map;

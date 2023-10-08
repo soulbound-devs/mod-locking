@@ -1,8 +1,8 @@
 package net.vakror.mod_locking.mod.config.configs;
 
-import com.google.gson.annotations.Expose;
-import net.vakror.mod_locking.mod.config.Config;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.minecraft.resources.ResourceLocation;
+import net.vakror.jamesconfig.config.config.individual.SimpleIndividualFileConfig;
+import net.vakror.mod_locking.ModLockingMod;
 import net.vakror.mod_locking.mod.unlock.FineGrainedModUnlock;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 
@@ -11,22 +11,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FineGrainedModUnlocksConfig extends Config<FineGrainedModUnlock> {
-    @Expose
+public class FineGrainedModUnlocksConfig extends SimpleIndividualFileConfig<FineGrainedModUnlock> {
     public List<FineGrainedModUnlock> fineGrainedUnlocks = new ArrayList<>();
 
-    @Override
-    public String getName() {
-        return "unlocks";
+    public static final FineGrainedModUnlocksConfig INSTANCE = new FineGrainedModUnlocksConfig();
+
+    public FineGrainedModUnlocksConfig() {
+        super("mod-locking/unlocks/fine-grained", new ResourceLocation(ModLockingMod.MOD_ID, "fine-grained"));
     }
 
-    @Override
-    public String getSubPath() {
-        return "unlocks/fine-grained";
-    }
-    @Override
-    public void add(FineGrainedModUnlock object) {
-        this.fineGrainedUnlocks.add(object);
+    public List<Unlock<?>> getAll() {
+        List<Unlock<?>> all = new ArrayList<>();
+        all.addAll(ModUnlocksConfig.INSTANCE.modUnlocks);
+        all.addAll(fineGrainedUnlocks);
+        return all;
     }
 
     @Override
@@ -34,26 +32,17 @@ public class FineGrainedModUnlocksConfig extends Config<FineGrainedModUnlock> {
         return fineGrainedUnlocks;
     }
 
-    public List<Unlock<?>> getAll() {
-        List<Unlock<?>> all = new ArrayList<>();
-        all.addAll(ModConfigs.MOD_UNLOCKS.modUnlocks);
-        all.addAll(fineGrainedUnlocks);
-        return all;
-    }
     @Override
-    protected void reset() {
+    public String getFileName(FineGrainedModUnlock object) {
+        return object.getName();
     }
 
-    public static Map<String, Integer> createCostMap(String point, int count) {
-        Map<String, Integer> hashMap = new HashMap<>();
-        hashMap.put(point, count);
-        return hashMap;
+    @Override
+    protected void resetToDefault() {
     }
 
-    public static Map<String, Integer> createCostMap(String point, String point1, int count, int count1) {
-        Map<String, Integer> hashMap = new HashMap<>();
-        hashMap.put(point, count);
-        hashMap.put(point1, count1);
-        return hashMap;
+    @Override
+    public Class<FineGrainedModUnlock> getConfigObjectClass() {
+        return FineGrainedModUnlock.class;
     }
 }

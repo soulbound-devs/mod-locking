@@ -6,7 +6,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.NetworkEvent;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
+import net.vakror.mod_locking.mod.config.configs.ModUnlocksConfig;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 import net.vakror.mod_locking.screen.widget.ModWidget;
 
@@ -33,7 +34,7 @@ public class UnlockModWidgetC2SPacket {
     public boolean handle(Supplier<NetworkEvent.Context> sup) {
         NetworkEvent.Context context = sup.get();
         context.enqueueWork(() -> {
-            for (Unlock<?> unlock : ModConfigs.MOD_UNLOCKS.getAll()) {
+            for (Unlock<?> unlock : ModUnlocksConfig.INSTANCE.getAll()) {
                 if (unlock.getName().equals(unlockName)) {
                     assert context.getSender() != null;
                     ModTreeCapability tree = context.getSender().getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability());
@@ -41,7 +42,7 @@ public class UnlockModWidgetC2SPacket {
                         context.getSender().getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).addUnlockedUnlock(unlock, context.getSender());
 
                         AtomicReference<Map<String, Integer>> points = new AtomicReference<>(new HashMap<>());
-                        ModConfigs.POINTS.points.forEach((point -> {
+                        ModPointsConfig.INSTANCE.points.forEach((point -> {
                             context.getSender().getCapability(ModTreeProvider.MOD_TREE).ifPresent((modTreeCapability -> {
                                 points.set(modTreeCapability.getPoints());
                             }));

@@ -3,7 +3,7 @@ package net.vakror.mod_locking.packet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
 import net.vakror.mod_locking.mod.point.ModPoint;
 import net.vakror.mod_locking.mod.tree.ModTree;
 
@@ -45,7 +45,7 @@ public class RequestPlayerTreesC2SPacket {
                 points.set(modTreeCapability.getPoints());
             }));
             AtomicReference<Map<String, Integer>> pointColors = new AtomicReference<>(new HashMap<>());
-            for (ModPoint point : ModConfigs.POINTS.points) {
+            for (ModPoint point : ModPointsConfig.INSTANCE.points) {
                 Map<String, Integer> newMap = pointColors.get();
                 newMap.put(point.name, point.getColor());
                 pointColors.set(newMap);

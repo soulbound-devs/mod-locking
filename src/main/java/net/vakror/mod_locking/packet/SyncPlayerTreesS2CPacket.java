@@ -7,7 +7,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.network.NetworkEvent;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.ModUnlocksConfig;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 import net.vakror.mod_locking.mod.util.CodecUtils;
@@ -63,7 +63,7 @@ public class SyncPlayerTreesS2CPacket {
                 unlockingScreen.setPlayerTrees(playerTrees);
             }
             if (reasonUnlocked) {
-                for (Unlock<?> unlock : ModConfigs.MOD_UNLOCKS.getAll()) {
+                for (Unlock<?> unlock : ModUnlocksConfig.INSTANCE.getAll()) {
                     if (unlock.getName().equals(unlockName) && unlock.getSound().isPresent()) {
                         Minecraft.getInstance().player.playSound(unlock.getSound().get(), 15,1);
                     }

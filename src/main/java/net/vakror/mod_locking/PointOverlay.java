@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
 import net.vakror.mod_locking.mod.point.ModPoint;
 
 public class PointOverlay {
@@ -16,7 +16,7 @@ public class PointOverlay {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         int i = 1;
-        for (ModPoint point : ModConfigs.POINTS.points) {
+        for (ModPoint point : ModPointsConfig.INSTANCE.points) {
             assert Minecraft.getInstance().player != null;
             if (Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints().get(point.name) != null) {
                 int amount = Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints().get(point.name);

@@ -1,30 +1,25 @@
 package net.vakror.mod_locking.mod.config.configs;
 
 import com.google.gson.annotations.Expose;
-import net.vakror.mod_locking.mod.config.Config;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.minecraft.resources.ResourceLocation;
+import net.vakror.jamesconfig.config.config.individual.SimpleIndividualFileConfig;
+import net.vakror.mod_locking.ModLockingMod;
 import net.vakror.mod_locking.mod.unlock.ModUnlock;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class ModUnlocksConfig extends Config<ModUnlock> {
+public class ModUnlocksConfig extends SimpleIndividualFileConfig<ModUnlock> {
     @Expose
     public List<ModUnlock> modUnlocks = new ArrayList<>();
 
-    @Override
-    public String getSubPath() {
-        return "unlocks/mod";
-    }
+    public static final ModUnlocksConfig INSTANCE = new ModUnlocksConfig();
 
-    @Override
-    public String getName() {
-        return "unlocks";
-    }
-
-    @Override
-    public void add(ModUnlock object) {
-        this.modUnlocks.add(object);
+    public ModUnlocksConfig() {
+        super("mod-locking/unlocks/mod", new ResourceLocation(ModLockingMod.MOD_ID, "mod-unlocks"));
     }
 
     @Override
@@ -32,26 +27,24 @@ public class ModUnlocksConfig extends Config<ModUnlock> {
         return modUnlocks;
     }
 
+    @Override
+    public String getFileName(ModUnlock object) {
+        return object.getFileName();
+    }
+
+    @Override
+    protected void resetToDefault() {
+    }
+
+    @Override
+    public Class<ModUnlock> getConfigObjectClass() {
+        return ModUnlock.class;
+    }
+
     public List<Unlock<?>> getAll() {
         List<Unlock<?>> all = new ArrayList<>();
         all.addAll(modUnlocks);
-        all.addAll(ModConfigs.FINE_GRAINED_MOD_UNLOCKS.fineGrainedUnlocks);
+        all.addAll(FineGrainedModUnlocksConfig.INSTANCE.fineGrainedUnlocks);
         return all;
-    }
-    @Override
-    protected void reset() {
-    }
-
-    public static Map<String, Integer> createCostMap(String point, int count) {
-        Map<String, Integer> hashMap = new HashMap<>();
-        hashMap.put(point, count);
-        return hashMap;
-    }
-
-    public static Map<String, Integer> createCostMap(String point, String point1, int count, int count1) {
-        Map<String, Integer> hashMap = new HashMap<>();
-        hashMap.put(point, count);
-        hashMap.put(point1, count1);
-        return hashMap;
     }
 }

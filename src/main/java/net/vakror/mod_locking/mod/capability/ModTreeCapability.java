@@ -4,10 +4,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
-import net.vakror.mod_locking.mod.config.ModConfigs;
 import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
+import net.vakror.mod_locking.mod.config.configs.ModTreesConfig;
 import net.vakror.mod_locking.mod.point.ModPoint;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.Unlock;
@@ -46,7 +45,7 @@ public class ModTreeCapability {
 
     public List<ModTree> getTrees() {
         if (trees == null) {
-            trees = ModConfigs.TREES.trees;
+            trees = ModTreesConfig.INSTANCE.trees;
         }
         return trees;
     }
@@ -57,7 +56,7 @@ public class ModTreeCapability {
 
     public Map<String, Integer> getPointColors() {
         Map<String, Integer> colors = new HashMap<>(points.size());
-        ModConfigs.POINTS.points.forEach((point) -> {
+        ModPointsConfig.INSTANCE.points.forEach((point) -> {
             colors.put(point.name, point.getColor());
         });
         return colors;
@@ -141,7 +140,7 @@ public class ModTreeCapability {
         }
         List<ModTree> playerTrees = this.trees;
         this.trees.clear();
-        for (ModTree tree : ModConfigs.TREES.trees) {
+        for (ModTree tree : ModTreesConfig.INSTANCE.trees) {
             if (modsUnlockedContainsTreeOfName(modsUnlocked, tree.name)) {
                 trees.add(tree.withUnlocks(getModsUnlockedOfTreeName(modsUnlocked, tree.name)));
                 modsUnlocked.remove(getModsUnlockedTreeOfName(modsUnlocked, tree.name));

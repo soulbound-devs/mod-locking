@@ -2,7 +2,10 @@ package net.vakror.mod_locking.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.ModPointsConfig;
+import net.vakror.mod_locking.mod.config.configs.ModTreesConfig;
+import net.vakror.mod_locking.mod.config.configs.ModUnlocksConfig;
+import net.vakror.mod_locking.mod.config.configs.UseItemPointObtainConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,18 +27,18 @@ public class RequestAllDataC2SPacket {
         NetworkEvent.Context context = sup.get();
         context.enqueueWork(() -> {
             Map<String, Integer> points = new HashMap<>();
-            ModConfigs.POINTS.points.forEach((point -> {
+            ModPointsConfig.INSTANCE.points.forEach((point -> {
                 points.put(point.name, 0);
             }));
             Map<String, Integer> pointColors = new HashMap<>();
-            ModConfigs.POINTS.points.forEach((point -> {
+            ModPointsConfig.INSTANCE.points.forEach((point -> {
                 pointColors.put(point.name, point.getColor());
             }));
             Map<String, String> pointPluralNames = new HashMap<>();
-            ModConfigs.POINTS.points.forEach((point -> {
+            ModPointsConfig.INSTANCE.points.forEach((point -> {
                 pointPluralNames.put(point.name, point.pluralName);
             }));
-            ModPackets.sendToClient(new SyncAllDataS2CPacket(ModConfigs.POINTS.points, ModConfigs.MOD_UNLOCKS.getAll(), ModConfigs.TREES.trees, ModConfigs.USE_ITEM_POINT_OBTAIN_METHODS.getAll(), false), context.getSender());
+            ModPackets.sendToClient(new SyncAllDataS2CPacket(ModPointsConfig.INSTANCE.points, ModUnlocksConfig.INSTANCE.getAll(), ModTreesConfig.INSTANCE.trees, UseItemPointObtainConfig.INSTANCE.getAll(), false), context.getSender());
         });
         return true;
     }

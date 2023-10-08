@@ -5,9 +5,10 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
+import net.vakror.jamesconfig.JamesConfigMod;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.*;
 import net.vakror.mod_locking.packet.ModPackets;
 import net.vakror.mod_locking.packet.SyncAllDataS2CPacket;
 import net.vakror.mod_locking.packet.SyncPlayerTreesS2CPacket;
@@ -23,8 +24,8 @@ public class ModLockingCommands {
 
         private int execute(CommandContext<CommandSourceStack> context) {
             try {
-                ModConfigs.register(false);
-                ModPackets.sendToClients(new SyncAllDataS2CPacket(ModConfigs.POINTS.points, ModConfigs.MOD_UNLOCKS.getAll(), ModConfigs.TREES.trees, ModConfigs.USE_ITEM_POINT_OBTAIN_METHODS.getAll(), true));
+                JamesConfigMod.registerAllConfigs(false);
+                ModPackets.sendToClients(new SyncAllDataS2CPacket(ModPointsConfig.INSTANCE.points, ModUnlocksConfig.INSTANCE.getAll(), ModTreesConfig.INSTANCE.trees, UseItemPointObtainConfig.INSTANCE.getAll(), true));
             } catch (Exception e) {
                 e.printStackTrace();
             }

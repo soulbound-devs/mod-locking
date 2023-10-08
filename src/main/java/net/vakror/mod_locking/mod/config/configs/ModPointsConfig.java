@@ -1,30 +1,22 @@
 package net.vakror.mod_locking.mod.config.configs;
 
 import com.google.gson.annotations.Expose;
-import net.vakror.mod_locking.mod.config.Config;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.minecraft.resources.ResourceLocation;
+import net.vakror.jamesconfig.config.config.individual.SimpleIndividualFileConfig;
+import net.vakror.mod_locking.ModLockingMod;
 import net.vakror.mod_locking.mod.point.ModPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModPointsConfig extends Config<ModPoint> {
+public class ModPointsConfig extends SimpleIndividualFileConfig<ModPoint> {
     @Expose
     public List<ModPoint> points = new ArrayList<>();
 
-    @Override
-    public String getSubPath() {
-        return "points";
-    }
+    public static final ModPointsConfig INSTANCE = new ModPointsConfig();
 
-    @Override
-    public String getName() {
-        return "points";
-    }
-
-    @Override
-    public void add(ModPoint object) {
-        points.add(object);
+    public ModPointsConfig() {
+        super("mod-locking/points", new ResourceLocation(ModLockingMod.MOD_ID, "points"));
     }
 
     @Override
@@ -33,11 +25,21 @@ public class ModPointsConfig extends Config<ModPoint> {
     }
 
     @Override
-    protected void reset() {
+    public String getFileName(ModPoint object) {
+        return object.getName();
     }
 
-    public static ModPoint getPoint(String point) {
-        for (ModPoint point1: ModConfigs.POINTS.points) {
+    @Override
+    protected void resetToDefault() {
+    }
+
+    @Override
+    public Class<ModPoint> getConfigObjectClass() {
+        return ModPoint.class;
+    }
+
+        public static ModPoint getPoint(String point) {
+        for (ModPoint point1: ModPointsConfig.INSTANCE.points) {
             if (point1.name.equals(point)) {
                 return point1;
             }

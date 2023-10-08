@@ -6,12 +6,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.vakror.mod_locking.locking.Restriction;
-import net.vakror.mod_locking.mod.config.ConfigObject;
 import net.vakror.mod_locking.mod.point.obtain.PointObtainMethod;
 
 import java.util.Map;
 
-public class ModPoint implements INBTSerializable<CompoundTag>, ConfigObject {
+public class ModPoint implements INBTSerializable<CompoundTag> {
 
     public static final Codec<ModPoint> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(ModPoint::getName),
@@ -88,10 +87,5 @@ public class ModPoint implements INBTSerializable<CompoundTag>, ConfigObject {
         red = nbt.getInt("red");
         green = nbt.getInt("green");
         green = nbt.getInt("green");
-    }
-
-    @Override
-    public String getFileName() {
-        return name;
     }
 }

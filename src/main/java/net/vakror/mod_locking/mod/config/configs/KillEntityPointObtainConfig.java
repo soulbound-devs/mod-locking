@@ -1,39 +1,28 @@
 package net.vakror.mod_locking.mod.config.configs;
 
-import com.google.gson.annotations.Expose;
-import net.vakror.mod_locking.mod.config.Config;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.minecraft.resources.ResourceLocation;
+import net.vakror.jamesconfig.config.config.individual.SimpleIndividualFileConfig;
+import net.vakror.mod_locking.ModLockingMod;
 import net.vakror.mod_locking.mod.point.obtain.KillEntityObtainMethod;
 import net.vakror.mod_locking.mod.point.obtain.PointObtainMethod;
-import net.vakror.mod_locking.mod.point.obtain.RightClickItemObtainMethod;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class KillEntityPointObtainConfig extends Config<KillEntityObtainMethod> {
-    @Expose
+public class KillEntityPointObtainConfig extends SimpleIndividualFileConfig<KillEntityObtainMethod> {
     public List<KillEntityObtainMethod> killEntityObtainMethods = new ArrayList<>();
+
+    public static final KillEntityPointObtainConfig INSTANCE = new KillEntityPointObtainConfig();
+
+    public KillEntityPointObtainConfig() {
+        super("mod-locking/point-obtain-methods/kill", new ResourceLocation(ModLockingMod.MOD_ID, "kill-point-obtain"));
+    }
 
     public List<PointObtainMethod> getAll() {
         List<PointObtainMethod> allMethods = new ArrayList<>();
         allMethods.addAll(killEntityObtainMethods);
-        allMethods.addAll(ModConfigs.USE_ITEM_POINT_OBTAIN_METHODS.useItemObtainMethods);
+        allMethods.addAll(UseItemPointObtainConfig.INSTANCE.useItemObtainMethods);
         return allMethods;
-    }
-
-    @Override
-    public String getSubPath() {
-        return "point_obtain_methods/kill_entity";
-    }
-
-    @Override
-    public String getName() {
-        return "point_obtain_methods";
-    }
-
-    @Override
-    public void add(KillEntityObtainMethod object) {
-        killEntityObtainMethods.add(object);
     }
 
     @Override
@@ -42,6 +31,16 @@ public class KillEntityPointObtainConfig extends Config<KillEntityObtainMethod> 
     }
 
     @Override
-    protected void reset() {
+    public String getFileName(KillEntityObtainMethod object) {
+        return object.getName();
+    }
+
+    @Override
+    protected void resetToDefault() {
+    }
+
+    @Override
+    public Class<KillEntityObtainMethod> getConfigObjectClass() {
+        return KillEntityObtainMethod.class;
     }
 }

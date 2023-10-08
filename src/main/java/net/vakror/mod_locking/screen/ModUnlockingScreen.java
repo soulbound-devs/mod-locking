@@ -3,21 +3,15 @@ package net.vakror.mod_locking.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.advancements.AdvancementTab;
 import net.minecraft.client.gui.screens.advancements.AdvancementTabType;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-import net.vakror.mod_locking.locking.Restriction;
 import net.vakror.mod_locking.mod.capability.ModTreeCapability;
 import net.vakror.mod_locking.mod.capability.ModTreeProvider;
-import net.vakror.mod_locking.mod.config.ModConfigs;
+import net.vakror.mod_locking.mod.config.configs.ModTreesConfig;
+import net.vakror.mod_locking.mod.config.configs.ModUnlocksConfig;
 import net.vakror.mod_locking.mod.tree.ModTree;
 import net.vakror.mod_locking.mod.unlock.Unlock;
 import net.vakror.mod_locking.screen.widget.ModTreeTab;
@@ -63,11 +57,11 @@ public class ModUnlockingScreen extends Screen {
 
     public ModUnlockingScreen(Component title) {
         super(title);
-        this.trees = ModConfigs.TREES.trees;
+        this.trees = ModTreesConfig.INSTANCE.trees;
         this.playerPoints = Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPoints();
         this.playerTrees = Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getTrees();
         this.pointColors = Minecraft.getInstance().player.getCapability(ModTreeProvider.MOD_TREE).orElse(new ModTreeCapability()).getPointColors();
-        this.unlocks = ModConfigs.MOD_UNLOCKS.getAll();
+        this.unlocks = ModUnlocksConfig.INSTANCE.getAll();
         tabs = new LinkedHashMap<>(trees.size());
     }
 
